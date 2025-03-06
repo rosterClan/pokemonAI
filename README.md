@@ -1,12 +1,9 @@
 <br />
 <div align="center">
   <a href="https://youtu.be/8SxA47AKwcE">
-    <img width="50%" src="https://drive.google.com/uc?export=view&id=" alt="Logo">
+    <img width="50%" src="https://drive.google.com/uc?export=view&id=17RucwJWSCUt8f98uOTTXWdtUB2DXl0zS" alt="Logo">
   </a>
   <h3 align="center">AI-Powered Gamified Plant Identification</h3>
-  <a align="center" href="">
-    <p>DEMONSTRATION VIDEO</p>
-  </a>
 </div>
 
 ## Built With
