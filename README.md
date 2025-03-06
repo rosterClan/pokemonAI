@@ -26,15 +26,13 @@ A mobile application designed to engage users in environmental conservation by g
 ## Clarifications
 This was a group project between myself and five other student developers. Much of the java backend wasn't developed by me. However, I was practically SOLY responceible for the entire backend. This includes creating the initial wireframes, mockups and pracitcal implementation. 
 
-
 ## Figma Designs
 <div align="center">
 <a href="https://www.figma.com/design/BoWXZOqBCZaKXAMIPhf9yh/irl-pokidex?node-id=0-1&t=9L3TQrPCnUU2SgmV-1">
-    <img width="50%" src="https://drive.google.com/uc?export=view&id=11DyQ_cICyHgRkZG78Fp4jcPYFUw0npyW" alt="Logo">
+    <img width="100%" src="https://drive.google.com/uc?export=view&id=11DyQ_cICyHgRkZG78Fp4jcPYFUw0npyW" alt="Logo">
 </a>
 </div>
 
-11DyQ_cICyHgRkZG78Fp4jcPYFUw0npyW
 ## How to setup
 Because I didn't work on the backend I'm not entirely sure how to get the entire project running, dispite including all the backend files. If you want to see some of my backend skills you can view my Arbitrage Odds Scraper. However, if you navigate to the frontend folder you'll be able to run my react application. Granted, you won't be able to get past the login screen. 
 
