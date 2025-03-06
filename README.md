@@ -3,8 +3,8 @@
   <a href="https://youtu.be/8SxA47AKwcE">
     <img width="50%" src="https://drive.google.com/uc?export=view&id=1OE1wadZnDNvwY7H572cv8JlR9xk-Df4Y" alt="Logo">
   </a>
-  <h3 align="center">Multi-Bookmaker Real-Time Horse Racing Odds Aggregator</h3>
-  <a align="center" href="https://youtu.be/8SxA47AKwcE">
+  <h3 align="center">AI-Powered Gamified Plant Identification</h3>
+  <a align="center" href="">
     <p>DEMONSTRATION VIDEO</p>
   </a>
 </div>
