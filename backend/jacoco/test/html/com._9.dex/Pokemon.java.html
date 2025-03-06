@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pokemon.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dex</a> &gt; <a href="index.source.html" class="el_package">com._9.dex</a> &gt; <span class="el_source">Pokemon.java</span></div><h1>Pokemon.java</h1><pre class="source lang-java linenums">package com._9.dex;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Pokemon {
+
+    private int pokemonID;
+    private String pokemonName;
+    private int plantType;
+    private String speciesName;
+    @JsonProperty
+    private int HP;
+    private int attackCategory;
+    private String attackDescription;
+    private int defenseCategory;
+    private String defenseDescription;
+    private String taxonomicCategory;
+
+<span class="fc" id="L19">    public Pokemon(){</span>
+
+<span class="fc" id="L21">    }</span>
+<span class="fc" id="L22">    public Pokemon(int pokemonID, String pokemonName, int plantType, String speciesName, int HP, int attackCategory, String attackDescription, int defenseCategory, String defenseDescription, String taxonomicCategory) {</span>
+<span class="fc" id="L23">        this.pokemonID = pokemonID;</span>
+<span class="fc" id="L24">        this.pokemonName = pokemonName;</span>
+<span class="fc" id="L25">        this.plantType = plantType;</span>
+<span class="fc" id="L26">        this.speciesName = speciesName;</span>
+<span class="fc" id="L27">        this.HP = HP;</span>
+<span class="fc" id="L28">        this.attackCategory = attackCategory;</span>
+<span class="fc" id="L29">        this.attackDescription = attackDescription;</span>
+<span class="fc" id="L30">        this.defenseCategory = defenseCategory;</span>
+<span class="fc" id="L31">        this.defenseDescription = defenseDescription;</span>
+<span class="fc" id="L32">        this.taxonomicCategory = taxonomicCategory;</span>
+<span class="fc" id="L33">    }</span>
+
+    //Getters
+
+    public int getPokemonID() {
+<span class="fc" id="L38">        return this.pokemonID;</span>
+    }
+
+    public String getPokemonName() {
+<span class="fc" id="L42">        return this.pokemonName;</span>
+    }
+
+    public int getPlantType() {
+<span class="fc" id="L46">        return this.plantType;</span>
+    }
+
+    public String getSpeciesName() {
+<span class="fc" id="L50">        return this.speciesName;</span>
+    }
+
+    public int getHP() {
+<span class="fc" id="L54">        return this.HP;</span>
+    }
+
+    public int getAttackCategory() {
+<span class="fc" id="L58">        return this.attackCategory;</span>
+    }
+
+    public String getAttackDescription() {
+<span class="fc" id="L62">        return this.attackDescription;</span>
+    }
+
+    public int getDefenseCategory() {
+<span class="fc" id="L66">        return this.defenseCategory;</span>
+    }
+
+    public String getDefenseDescription() {
+<span class="fc" id="L70">        return this.defenseDescription;</span>
+    }
+
+    public String getTaxonomicCategory() {
+<span class="fc" id="L74">        return this.taxonomicCategory;</span>
+    }
+
+
+    public void setHP(int hp) {
+<span class="fc" id="L79">        this.HP = hp;</span>
+<span class="fc" id="L80">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

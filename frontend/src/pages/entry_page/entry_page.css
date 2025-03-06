@@ -1,0 +1,134 @@
+
+
+.entry_page_header {
+    flex:1;
+    width: 100%;
+    height: 100%;
+    background-color: #E6E3C0;
+    border-radius: 15px 15px 0px 0px;
+}
+
+.entry_page_misc_wpr {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.entry_page_body {
+    flex:2;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.entry_page_wpr {
+    height: 100%;
+    width: 100%;
+
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.entry_page_body_main {
+    width: 100%;
+    height: 100%;
+    flex: 5;
+}
+
+.entry_page_misc {
+    width: fit-content;
+    height: fit-content;
+    margin-left: 5px;
+    margin-right: 5px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.entry_page_misc_text {
+    margin-left: 5px;
+}
+
+.entry_page_title {
+    text-align: center;
+    font-size: 60px;
+    padding: 0px;
+    margin: 0px;
+    margin-top: 20px;
+}
+
+.entry_page_species {
+    text-align: center;
+    font-size: 30px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.page_content_image {
+    width: 200px;
+    height: 200px;
+    background-color: blue;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.page_content_img {
+    width: 100%;
+    height: 100%;
+}
+
+.entry_page_body_description {
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+.attribute_wpr {
+    width: 100%;
+    height: 100px;
+    margin-top: 25px;
+    margin-bottom: 40px;
+}
+
+.attack_description {
+    margin: 0px;
+    margin-left: 20px;
+    margin-top: 15px;
+}
+
+
+
+
+
+
+.download_loc_data_image {
+    width: 100%;
+    height: 100%;
+}
+
+.download_loc_data_image_wpr {
+    position: absolute;
+    top: 21px;
+    left: 90%;
+    float: right;
+    width: 25px;
+    height: 35px;
+    
+}

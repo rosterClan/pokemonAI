@@ -1,0 +1,32 @@
+
+
+
+.processor_bar {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    text-align: center;
+    align-content: center;
+
+    flex-direction: row;
+}
+
+.loading_bar_wpr {
+    flex: 1;
+
+    
+    max-width: 90%;
+    max-height: 40px;
+    margin: auto;
+}
+
+.loading_bar_title p {
+    font-size: 45px;
+    margin: 0px;
+    padding: 0px;
+
+    margin-bottom: 8px;
+}

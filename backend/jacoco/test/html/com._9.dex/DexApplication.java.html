@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DexApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dex</a> &gt; <a href="index.source.html" class="el_package">com._9.dex</a> &gt; <span class="el_source">DexApplication.java</span></div><h1>DexApplication.java</h1><pre class="source lang-java linenums">package com._9.dex;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+@RequestMapping(&quot;/api&quot;)
+
+<span class="fc" id="L37">public class DexApplication {</span>
+<span class="fc" id="L38">	private final Database database = new Database(&quot;test.db&quot;);</span>
+
+	public User getUserFromSession(String token) {
+<span class="fc" id="L41">		return this.database.validateToken(token);</span>
+	}
+
+	@CrossOrigin(origins = &quot;*&quot;)
+	@PostMapping(&quot;/performScan&quot;)
+	public ResponseEntity&lt;String&gt; performScan(@RequestBody JSONObject body) {
+<span class="fc" id="L47">		JSONObject json = new JSONObject();</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">		if (!body.containsKey(&quot;token&quot;)) {</span>
+<span class="fc" id="L49">			json.put(&quot;error&quot;,&quot;token error&quot;);</span>
+<span class="fc" id="L50">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+<span class="nc" id="L52">		User releventUser = this.getUserFromSession((String) body.get(&quot;token&quot;));</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">		if (releventUser == null) {</span>
+<span class="nc" id="L54">			json.put(&quot;error&quot;,&quot;token error&quot;);</span>
+<span class="nc" id="L55">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.UNAUTHORIZED);</span>
+		}
+
+<span class="nc" id="L58">		return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.OK);</span>
+	}
+
+	@CrossOrigin(origins = &quot;*&quot;)
+	@PostMapping(&quot;/getUserDex&quot;)
+	public ResponseEntity&lt;String&gt; getUserDex(@RequestBody JSONObject body) {
+<span class="fc" id="L64">		JSONObject json = new JSONObject();</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">		if (!body.containsKey(&quot;token&quot;)) {</span>
+<span class="fc" id="L66">			json.put(&quot;error&quot;,&quot;token error&quot;);</span>
+<span class="fc" id="L67">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+<span class="nc" id="L69">		User releventUser = this.getUserFromSession((String) body.get(&quot;token&quot;));</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		if (releventUser == null) {</span>
+<span class="nc" id="L71">			json.put(&quot;error&quot;,&quot;token error&quot;);</span>
+<span class="nc" id="L72">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.UNAUTHORIZED);</span>
+		}
+
+<span class="nc" id="L75">		JSONArray dexPokemon = this.database.getDexByUserID(releventUser.getID());</span>
+<span class="nc" id="L76">		return new ResponseEntity&lt;&gt;(dexPokemon.toJSONString(), HttpStatus.OK);</span>
+	}
+
+	@CrossOrigin(origins = &quot;*&quot;)
+	@PostMapping(&quot;/getSightingByID&quot;)
+	public ResponseEntity&lt;String&gt; getSightingByID(@RequestBody JSONObject body) {
+<span class="fc" id="L82">		JSONObject json = new JSONObject();</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">		if (!body.containsKey(&quot;token&quot;)) {</span>
+<span class="fc" id="L84">			json.put(&quot;error&quot;,&quot;token error&quot;);</span>
+<span class="fc" id="L85">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+<span class="nc" id="L87">		User releventUser = this.getUserFromSession((String) body.get(&quot;token&quot;));</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">		if (releventUser == null) {</span>
+<span class="nc" id="L89">			json.put(&quot;error&quot;,&quot;token error&quot;);</span>
+<span class="nc" id="L90">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.UNAUTHORIZED);</span>
+		}
+<span class="nc bnc" id="L92" title="All 2 branches missed.">		if (!body.containsKey(&quot;sightingID&quot;)) {</span>
+<span class="nc" id="L93">			json.put(&quot;error&quot;,&quot;No sightingID was provided.&quot;);</span>
+<span class="nc" id="L94">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.UNAUTHORIZED);</span>
+		}
+
+<span class="nc" id="L97">		JSONObject pokemon = this.database.getSightingByID(Integer.parseInt(((String)body.get(&quot;sightingID&quot;))));</span>
+<span class="nc" id="L98">		return new ResponseEntity&lt;&gt;(pokemon.toJSONString(), HttpStatus.OK);</span>
+	}
+
+	@CrossOrigin(origins = &quot;*&quot;)
+	@PostMapping(&quot;/register&quot;)
+	public ResponseEntity&lt;String&gt; register(@RequestBody JSONObject body) {
+<span class="fc" id="L104">		JSONObject json = new JSONObject();</span>
+
+<span class="fc" id="L106">		String username = (String) body.get(&quot;username&quot;);</span>
+<span class="fc" id="L107">		String password1 = (String) body.get(&quot;password1&quot;);</span>
+<span class="fc" id="L108">		String password2 = (String) body.get(&quot;password2&quot;);</span>
+<span class="fc" id="L109">		String email = (String) body.get(&quot;email&quot;);</span>
+<span class="fc" id="L110">		String securityQuestion = (String) body.get(&quot;securityQuestion&quot;);</span>
+<span class="fc" id="L111">		String securityAnswer = (String) body.get(&quot;securityAnswer&quot;);</span>
+
+<span class="pc bpc" id="L113" title="10 of 12 branches missed.">		if (username == null || password1 == null || password2 == null || email == null || securityQuestion == null || securityAnswer == null) {</span>
+<span class="fc" id="L114">			json.put(&quot;error&quot;, &quot;Missing required fields&quot;);</span>
+<span class="fc" id="L115">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.BAD_REQUEST);</span>
+		}
+
+<span class="nc bnc" id="L118" title="All 2 branches missed.">		if (!password1.equals(password2)) {</span>
+<span class="nc" id="L119">			json.put(&quot;error&quot;,&quot;Passwords do not match&quot;);</span>
+<span class="nc" id="L120">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.BAD_REQUEST);</span>
+		}
+
+<span class="nc" id="L123">		User user = new User(username, password1, email, 1, securityQuestion, securityAnswer);</span>
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">		if (database.getUser(username) != null) {</span>
+<span class="nc" id="L126">			json.put(&quot;error&quot;,&quot;Username already exists&quot;);</span>
+<span class="nc" id="L127">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.BAD_REQUEST);</span>
+		} else {
+<span class="nc" id="L129">			database.insertUser(user);</span>
+<span class="nc" id="L130">			User found_user = database.getUser(user.getUsername());</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">			if (found_user == null) {</span>
+<span class="nc" id="L132">				json.put(&quot;error&quot;,&quot;internal server error&quot;);</span>
+<span class="nc" id="L133">				return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.OK);</span>
+			}
+<span class="nc" id="L135">			String key = database.getNewSession(found_user.getID());</span>
+<span class="nc" id="L136">			json.put(&quot;token&quot;,key);</span>
+<span class="nc" id="L137">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.OK);</span>
+
+		}
+
+	}
+
+	@CrossOrigin(origins = &quot;*&quot;)
+	@PostMapping(&quot;/login&quot;)
+	public ResponseEntity&lt;String&gt; login(@RequestBody JSONObject body) {
+<span class="fc" id="L146">		JSONObject json = new JSONObject();</span>
+<span class="fc" id="L147">		String username = (String) body.get(&quot;username&quot;);</span>
+<span class="fc" id="L148">		String password = (String) body.get(&quot;password&quot;);</span>
+
+<span class="pc bpc" id="L150" title="2 of 4 branches missed.">		if (username == null || password == null) {</span>
+<span class="nc" id="L151">			json.put(&quot;error&quot;, &quot;Missing required fields&quot;);</span>
+<span class="nc" id="L152">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.BAD_REQUEST);</span>
+		}
+
+<span class="fc" id="L155">		User user = database.getUser(username);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">		if (user == null) {</span>
+<span class="fc" id="L157">			json.put(&quot;error&quot;, &quot;User not found&quot;);</span>
+<span class="fc" id="L158">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.NOT_FOUND);</span>
+		}
+
+<span class="nc bnc" id="L161" title="All 2 branches missed.">		if (!password.equals(user.getPassword())) {//(!user.validatePassword(password)) {</span>
+<span class="nc" id="L162">			json.put(&quot;error&quot;, &quot;Incorrect password&quot;);</span>
+<span class="nc" id="L163">			return new ResponseEntity&lt;&gt;(json.toJSONString(), HttpStatus.UNAUTHORIZED);</span>
+		}
+
+<span class="nc" id="L166">		String sessionkey = database.getNewSession(user.getID());</span>
+<span class="nc" id="L167">		HttpCookie cookie = ResponseCookie.from(&quot;sessionkey&quot;, sessionkey).path(&quot;/&quot;).build();</span>
+
+<span class="nc" id="L169">		json.put(&quot;token&quot;, sessionkey);</span>
+<span class="nc" id="L170">		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(json.toJSONString());</span>
+	}
+
+	@PostMapping(&quot;/logout&quot;)
+	public ResponseEntity&lt;String&gt; logout(@CookieValue(value = &quot;sessionkey&quot;) String sessionkey) {
+		//Get the session key from the cookies
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">		if (sessionkey == null) {</span>
+<span class="nc" id="L177">			return new ResponseEntity&lt;&gt;(&quot;No login session&quot;, HttpStatus.BAD_REQUEST);</span>
+		} else {
+<span class="fc" id="L179">			database.closeSession(sessionkey);</span>
+<span class="fc" id="L180">			return new ResponseEntity&lt;&gt;(&quot;Logged out&quot;, HttpStatus.OK);</span>
+		}
+	}
+
+	// Define the REST endpoint to get leaderboard entries
+	@GetMapping(&quot;/leaderboard&quot;)
+	public List&lt;LeaderboardEntry&gt; getLeaderboard() {
+		// Use the database object to fetch leaderboard entries
+<span class="fc" id="L188">		return database.getLeaderboard();</span>
+	}
+
+	@GetMapping(&quot;/hello&quot;)
+	public String hello(@RequestParam(value = &quot;name&quot;, defaultValue = &quot;World&quot;) String name) {
+<span class="fc" id="L193">		return String.format(&quot;Hello %s!&quot;, name);</span>
+	}
+
+	// User CRUD operations.
+	@GetMapping(&quot;/getUser/{id}&quot;)
+	public User getUserbyId(@PathVariable int id){
+<span class="fc" id="L199">		User user = database.getUser(id);</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">		if (user == null) {</span>
+<span class="nc" id="L201">			return null;</span>
+		}
+<span class="fc" id="L203">		return user;</span>
+	}
+
+	@PostMapping(&quot;/createUser&quot;)
+	public ResponseEntity&lt;String&gt; createUser(@RequestBody User user) {
+		try {
+<span class="fc" id="L209">			boolean isInserted = database.insertUser(user);</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">			if (isInserted) {</span>
+<span class="nc" id="L211">				return new ResponseEntity&lt;&gt;(&quot;User created successfully&quot;, HttpStatus.CREATED); // 201 Created</span>
+			} else {
+<span class="fc" id="L213">				return new ResponseEntity&lt;&gt;(&quot;Failed to create user&quot;, HttpStatus.INTERNAL_SERVER_ERROR); // 500 Internal Server Error</span>
+			}
+<span class="nc" id="L215">		} catch (Exception e) {</span>
+<span class="nc" id="L216">			return new ResponseEntity&lt;&gt;(&quot;Error creating user: &quot; + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+	}
+
+	@PutMapping(&quot;/updateUser/{id}&quot;)
+	public ResponseEntity&lt;String&gt; updateUser(@PathVariable int id, @RequestBody User user) {
+		try {
+<span class="fc" id="L223">			boolean isUpdated = database.updateUser(id, user);</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">			if (isUpdated) {</span>
+<span class="nc" id="L225">				return new ResponseEntity&lt;&gt;(&quot;User updated successfully&quot;, HttpStatus.OK);</span>
+			} else {
+<span class="fc" id="L227">				return new ResponseEntity&lt;&gt;(&quot;User not found or no changes were made&quot;, HttpStatus.NOT_FOUND);</span>
+			}
+<span class="nc" id="L229">		} catch (Exception e) {</span>
+<span class="nc" id="L230">			return new ResponseEntity&lt;&gt;(&quot;Error updating user: &quot; + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+	}
+
+	@DeleteMapping(&quot;/deleteUser/{id}&quot;)
+	public ResponseEntity&lt;String&gt; deleteUser(@PathVariable int id) {
+		try {
+<span class="fc" id="L237">			boolean isDeleted = database.deleteUser(id);</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">			if (isDeleted) {</span>
+<span class="nc" id="L239">				return new ResponseEntity&lt;&gt;(&quot;User deleted successfully&quot;, HttpStatus.OK);</span>
+			} else {
+<span class="fc" id="L241">				return new ResponseEntity&lt;&gt;(&quot;User not found or could not be deleted&quot;, HttpStatus.NOT_FOUND);</span>
+			}
+<span class="nc" id="L243">		} catch (Exception e) {</span>
+<span class="nc" id="L244">			return new ResponseEntity&lt;&gt;(&quot;Error deleting user: &quot; + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+	}
+
+	//Pokemon CRUD
+	@PostMapping(&quot;/createPokemon&quot;)
+	public ResponseEntity&lt;String&gt; createPokemon(@RequestBody Pokemon pokemon) {
+<span class="fc" id="L251">		boolean isInserted = database.insertPokemon(pokemon);</span>
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">		if (isInserted) {</span>
+<span class="nc" id="L253">			return new ResponseEntity&lt;&gt;(&quot;Pokemon created successfully&quot;, HttpStatus.CREATED);</span>
+		} else {
+<span class="fc" id="L255">			return new ResponseEntity&lt;&gt;(&quot;Failed to create Pokemon&quot;, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+		}
+	}
+
+	@GetMapping(&quot;/getPokemon&quot;)
+	public ResponseEntity&lt;Object&gt; getPokemon(
+			@RequestParam(required = false) Integer id,
+			@RequestParam(required = false) String name) {
+
+		// If neither id nor name is provided, return a 400 Bad Request
+<span class="pc bpc" id="L265" title="3 of 4 branches missed.">		if (id == null &amp;&amp; name == null) {</span>
+<span class="nc" id="L266">			return new ResponseEntity&lt;&gt;(&quot;Either 'id' or 'name' must be provided&quot;, HttpStatus.BAD_REQUEST);</span>
+		}
+
+		// Call the getPokemon method in the Database handler
+<span class="fc" id="L270">		Pokemon pokemon = database.getPokemon(id, name);</span>
+
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">		if (pokemon != null) {</span>
+<span class="fc" id="L273">			return new ResponseEntity&lt;&gt;(pokemon, HttpStatus.OK);</span>
+		} else {
+<span class="nc" id="L275">			return new ResponseEntity&lt;&gt;(&quot;Pokemon not found.&quot;,HttpStatus.NOT_FOUND);</span>
+		}
+	}
+
+	// UPDATE: Update Pokemon
+	@PutMapping(&quot;/updatePokemon/{id}&quot;)
+	public ResponseEntity&lt;String&gt; updatePokemon(
+			@PathVariable Integer id,
+			@RequestBody Pokemon pokemon) {
+		// If neither id nor name is provided, return a 400 Bad Request
+<span class="fc" id="L285">		boolean isUpdated = database.updatePokemon(id, pokemon);</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">		if (isUpdated) {</span>
+<span class="nc" id="L287">			return new ResponseEntity&lt;&gt;(&quot;Pokemon updated successfully&quot;, HttpStatus.OK);</span>
+		} else {
+<span class="fc" id="L289">			return new ResponseEntity&lt;&gt;(&quot;Failed to update Pokemon&quot;, HttpStatus.NOT_FOUND);</span>
+		}
+	}
+	// DELETE: Delete Pokemon
+
+	@DeleteMapping(&quot;deletePokemon/{id}&quot;)
+	public ResponseEntity&lt;String&gt; deletePokemon(@PathVariable int id) {
+<span class="fc" id="L296">		boolean isDeleted = database.deletePokemon(id);</span>
+<span class="pc bpc" id="L297" title="1 of 2 branches missed.">		if (isDeleted) {</span>
+<span class="nc" id="L298">			return new ResponseEntity&lt;&gt;(&quot;Pokemon deleted successfully&quot;, HttpStatus.OK);</span>
+		} else {
+<span class="fc" id="L300">			return new ResponseEntity&lt;&gt;(&quot;Failed to delete Pokemon&quot;, HttpStatus.NOT_FOUND);</span>
+		}
+	}
+
+
+	@GetMapping(&quot;getPokemonImageById/{id}&quot;)
+	public ResponseEntity&lt;String&gt; getPokemonImageById(@PathVariable Integer id) {
+		//retrieve image from database
+<span class="fc" id="L308">		PokemonGeneratedImage img = database.getPokemonImageById(id);</span>
+
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">		if (img != null) {</span>
+<span class="fc" id="L311">			String base64Encoded = Base64.getEncoder().encodeToString(img.getImage());</span>
+			// create a response
+<span class="fc" id="L313">			JSONObject response = new JSONObject();</span>
+<span class="fc" id="L314">			response.put(&quot;id&quot;, img.getPokemonID());</span>
+<span class="fc" id="L315">			response.put(&quot;image&quot;, base64Encoded);</span>
+<span class="fc" id="L316">			return new ResponseEntity&lt;&gt;(response.toString(), HttpStatus.OK);</span>
+		}
+		else {
+<span class="nc" id="L319">			return new ResponseEntity&lt;&gt;(&quot;Pokemon Image not found.&quot;,HttpStatus.NOT_FOUND);</span>
+		}
+	}
+
+	public static void main(String[] args) {
+<span class="fc" id="L324">		SpringApplication.run(DexApplication.class, args);</span>
+<span class="fc" id="L325">	}</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

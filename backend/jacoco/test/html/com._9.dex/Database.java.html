@@ -1,0 +1,1026 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Database.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dex</a> &gt; <a href="index.source.html" class="el_package">com._9.dex</a> &gt; <span class="el_source">Database.java</span></div><h1>Database.java</h1><pre class="source lang-java linenums">package com._9.dex;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.JSONObject;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.hibernate.engine.jdbc.BlobProxy;
+
+import java.io.FileNotFoundException;
+
+import java.io.InputStreamReader;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.*;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Database {
+
+    private String filePath;
+<span class="fc" id="L33">    private Connection conn = null;</span>
+
+<span class="fc" id="L35">    public Database(@Value(&quot;${database.filePath}&quot;) String filePath) {</span>
+<span class="fc" id="L36">        this.filePath = filePath;</span>
+        //Check if file exists, if not create a new database file.
+        try {
+            //Initialise the database.
+<span class="fc" id="L40">            String url = &quot;jdbc:sqlite:&quot; + filePath;</span>
+<span class="fc" id="L41">            conn = DriverManager.getConnection(url);</span>
+<span class="fc" id="L42">            System.out.println(&quot;Connection to SQLite has been established.&quot;);</span>
+
+<span class="nc" id="L44">        } catch (SQLException e) {</span>
+<span class="nc" id="L45">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L46">        } catch (Exception e) {</span>
+<span class="nc" id="L47">            e.printStackTrace();</span>
+<span class="pc" id="L48">        }</span>
+<span class="fc" id="L49">    }</span>
+
+    public void createTables() {
+<span class="fc" id="L52">        List&lt;String&gt; tables = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L54">        String sql1 = &quot;CREATE TABLE IF NOT EXISTS Users (&quot;</span>
+            + &quot;	UserID integer PRIMARY KEY,&quot;
+            + &quot; Email text NOT NULL,&quot;
+            + &quot;	Username text NOT NULL,&quot;
+            + &quot;	Password text NOT NULL,&quot;
+            + &quot; Security_question text NOT NULL,&quot;
+            + &quot; Security_answer text NOT NULL,&quot;
+            + &quot; RoleID integer NOT NULL,&quot;
+            + &quot; FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)&quot;
+            + &quot;);&quot;;
+<span class="fc" id="L64">        tables.add(sql1);</span>
+
+<span class="fc" id="L66">        String sql2 = &quot;Create Table IF NOT EXISTS userFollowing (&quot;</span>
+            + &quot; Id integer PRIMARY KEY,&quot;
+            + &quot; UserID integer NOT NULL,&quot;
+            + &quot; FollowingUserID integer NOT NULL,&quot;
+            + &quot; FOREIGN KEY (UserID) REFERENCES Users(UserID),&quot;
+            + &quot; FOREIGN KEY (FollowingUserID) REFERENCES Users(UserID)&quot;
+            + &quot;);&quot;;
+<span class="fc" id="L73">        tables.add(sql2);</span>
+
+<span class="fc" id="L75">        String sql3 = &quot;CREATE TABLE IF NOT EXISTS Roles (&quot;</span>
+            + &quot; RoleID INTEGER PRIMARY KEY,&quot;
+            + &quot; RoleName text NOT NULL,&quot;
+            + &quot; RoleDescription text NOT NULL&quot;
+            + &quot;);&quot;;
+<span class="fc" id="L80">        tables.add(sql3);</span>
+
+<span class="fc" id="L82">        String sql4 = &quot;CREATE TABLE IF NOT EXISTS PlantTypes (&quot; +</span>
+            &quot;    PlantTypeID INTEGER PRIMARY KEY,&quot; +
+            &quot;    PlantTypeName TEXT NOT NULL,&quot; +
+            &quot;    PlantTypeDesc TEXT&quot; +
+            &quot; );&quot;;
+<span class="fc" id="L87">        tables.add(sql4);</span>
+
+<span class="fc" id="L89">        String sql5 = &quot;CREATE TABLE IF NOT EXISTS AttributeCategories (&quot; +</span>
+            &quot;    AttributeCatID INTEGER PRIMARY KEY,&quot; +
+            &quot;    AttributeCatName TEXT NOT NULL,&quot; +
+            &quot;    AttributeCatDesc TEXT&quot; +
+            &quot;);&quot;;
+<span class="fc" id="L94">        tables.add(sql5);</span>
+
+<span class="fc" id="L96">        String sql7 = &quot;CREATE TABLE IF NOT EXISTS Biomes (&quot; +</span>
+            &quot;    BiomeID INTEGER PRIMARY KEY,&quot; +
+            &quot;    BiomeName TEXT NOT NULL,&quot; +
+            &quot;    BiomeDescription TEXT&quot; +
+            &quot;);&quot;;
+<span class="fc" id="L101">        tables.add(sql7);</span>
+
+<span class="fc" id="L103">        String sql8 = &quot;CREATE TABLE IF NOT EXISTS Pokemon (&quot; +</span>
+            &quot;    PokemonID INTEGER PRIMARY KEY,&quot; +
+            &quot;    PokemonName TEXT NOT NULL,&quot; +
+            &quot;    PlantType INTEGER,&quot; +
+            &quot;    SpeciesName TEXT NOT NULL,&quot; +
+            &quot;    HP INTEGER,&quot; +
+            &quot;    AttackCategory INTEGER,&quot; +
+            &quot;    AttackDesc TEXT,&quot; +
+            &quot;    DefenseCategory INTEGER,&quot; +
+            &quot;    DefenseDesc TEXT,&quot; +
+            &quot;    TaxonomicCategory TEXT,&quot; +
+            &quot;    FOREIGN KEY (PlantType) REFERENCES PlantTypes(PlantTypeID),&quot; +
+            &quot;    FOREIGN KEY (AttackCategory) REFERENCES AttributeCategories(AttributeCatID),&quot; +
+            &quot;    FOREIGN KEY (DefenseCategory) REFERENCES AttributeCategories(AttributeCatID)&quot; +
+            &quot;);&quot;;
+<span class="fc" id="L118">        tables.add(sql8);</span>
+
+<span class="fc" id="L120">        String sql9 = &quot;CREATE TABLE IF NOT EXISTS PokemonGeneratedImage (&quot; +</span>
+            &quot;    PokemonID INTEGER PRIMARY KEY,&quot; +
+            &quot;    Image BLOB,&quot; +
+            &quot;    FOREIGN KEY (PokemonID) REFERENCES Pokemon(PokemonID)&quot; +
+            &quot;);&quot;;
+<span class="fc" id="L125">        tables.add(sql9);</span>
+
+<span class="fc" id="L127">        String sql10 = &quot;CREATE TABLE IF NOT EXISTS PokemonRealImage (&quot; +</span>
+            &quot;    PokemonID INTEGER PRIMARY KEY,&quot; +
+            &quot;    Image BLOB,&quot; +
+            &quot;    FOREIGN KEY (PokemonID) REFERENCES Pokemon(PokemonID)&quot; +
+            &quot;);&quot;;
+<span class="fc" id="L132">        tables.add(sql10);</span>
+
+<span class="fc" id="L134">        String sql11 = &quot;CREATE TABLE IF NOT EXISTS PokemonSightings (&quot; +</span>
+            &quot;    SightingID INTEGER PRIMARY KEY,&quot; +
+            &quot;    UserID INTEGER NOT NULL,&quot; +
+            &quot;    PokemonID INTEGER NOT NULL,&quot; +
+            &quot;    BiomeID INTEGER NOT NULL,&quot; +
+            &quot;    Longitude REAL,&quot; +
+            &quot;    Latitude REAL,&quot; +
+            &quot;    FoundDate DATETIME,&quot; +
+            &quot;    FOREIGN KEY (UserID) REFERENCES Users(UserID),&quot; +
+            &quot;    FOREIGN KEY (PokemonID) REFERENCES Pokemon(PokemonID),&quot; +
+            &quot;    FOREIGN KEY (BiomeID) REFERENCES Biomes(BiomeID)&quot; +
+            &quot;);&quot;;
+<span class="fc" id="L146">        tables.add(sql11);</span>
+
+<span class="fc" id="L148">        String sql12 = &quot;CREATE TABLE IF NOT EXISTS Sessions (&quot; +</span>
+                &quot; SessionID INTEGER PRIMARY KEY,&quot; +
+                &quot; UserID INTEGER NOT NULL,&quot; +
+                &quot; SessionToken TEXT NOT NULL,&quot; +
+                &quot; ExpiryDate DATETIME NOT NULL, &quot; +
+                &quot; IsActive BOOLEAN NOT NULL,&quot; +
+                &quot; FOREIGN KEY (USERID) REFERENCES Users(UserID)&quot; +
+                &quot;);&quot;;
+<span class="fc" id="L156">        tables.add(sql12);</span>
+
+        // Use a single connection for all table creations
+<span class="fc" id="L159">        try (Statement stmt = conn.createStatement()) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            for (String table : tables) {</span>
+<span class="fc" id="L161">                stmt.execute(table);</span>
+<span class="fc" id="L162">            }</span>
+<span class="fc" id="L163">            System.out.println(&quot;All tables created successfully.&quot;);</span>
+<span class="nc" id="L164">        } catch (SQLException e) {</span>
+<span class="nc" id="L165">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L166">        }</span>
+
+//        for (String table : tables) {
+//            try (Connection conn = DriverManager.getConnection(&quot;jdbc:sqlite:&quot; + filePath);
+//                Statement stmt = conn.createStatement()) {
+//                stmt.execute(table);
+//            } catch (SQLException e) {
+//                System.out.println(e.getMessage());
+//            }
+//        }
+<span class="fc" id="L176">    }</span>
+
+    public String getNewSession(int UserID) {
+        //Check for current session
+<span class="fc" id="L180">        String sql = &quot;SELECT * FROM Sessions WHERE UserID = ? AND IsActive = 1 ORDER BY ExpiryDate DESC LIMIT 1&quot;;</span>
+        try {
+<span class="fc" id="L182">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L183">            stmt.setInt(1, UserID);</span>
+<span class="fc" id="L184">            ResultSet rs = stmt.executeQuery();</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">            if (rs.next()) {</span>
+<span class="fc" id="L186">                return rs.getString(&quot;SessionToken&quot;);</span>
+            } else {
+<span class="nc" id="L188">                sql = &quot;INSERT INTO Sessions (UserID, SessionToken, ExpiryDate, IsActive) VALUES (?, ?, ?, ?)&quot;;</span>
+                try {
+<span class="nc" id="L190">                    stmt = conn.prepareStatement(sql);</span>
+<span class="nc" id="L191">                    stmt.setInt(1, UserID);</span>
+<span class="nc" id="L192">                    String sessionToken = UUID.randomUUID().toString();</span>
+<span class="nc" id="L193">                    stmt.setString(2, sessionToken);</span>
+<span class="nc" id="L194">                    stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis() + 3600000));</span>
+<span class="nc" id="L195">                    stmt.setBoolean(4, true);</span>
+<span class="nc" id="L196">                    stmt.executeUpdate();</span>
+                    
+<span class="nc" id="L198">                    return sessionToken;</span>
+<span class="nc" id="L199">                } catch (SQLException e) {</span>
+<span class="nc" id="L200">                    System.out.println(e.getMessage());</span>
+<span class="nc" id="L201">                } catch (Exception e) {</span>
+<span class="nc" id="L202">                    e.printStackTrace();</span>
+<span class="nc" id="L203">                }</span>
+            }
+<span class="nc" id="L205">        } catch (SQLException e) {</span>
+<span class="nc" id="L206">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L207">        } catch (Exception e) {</span>
+<span class="nc" id="L208">            e.printStackTrace();</span>
+<span class="nc" id="L209">        }</span>
+<span class="nc" id="L210">        return null;</span>
+    }
+
+    public void closeSession(String sessionToken) {
+<span class="fc" id="L214">        String sql = &quot;UPDATE Sessions SET IsActive = 0 WHERE SessionToken = ?&quot;;</span>
+        try {
+<span class="fc" id="L216">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L217">            stmt.setString(1, sessionToken);</span>
+<span class="nc" id="L218">            stmt.executeUpdate();</span>
+<span class="fc" id="L219">        } catch (SQLException e) {</span>
+<span class="fc" id="L220">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L221">        } catch (Exception e) {</span>
+<span class="nc" id="L222">            e.printStackTrace();</span>
+<span class="pc" id="L223">        }</span>
+<span class="fc" id="L224">    }</span>
+
+    public void insertDefaultValues() {
+        //Open JSON default values from resources
+<span class="fc" id="L228">        JSONParser parser = new JSONParser();</span>
+        try {
+<span class="fc" id="L230">            Resource res = new ClassPathResource(&quot;defaultValues.json&quot;);</span>
+
+<span class="fc" id="L232">            JSONParser jsonParser = new JSONParser();</span>
+<span class="fc" id="L233">            InputStreamReader reader = new InputStreamReader(res.getInputStream());</span>
+
+<span class="fc" id="L235">            JSONObject defaultVals = (JSONObject) parser.parse(reader);</span>
+
+<span class="fc" id="L237">            JSONObject user = (JSONObject) defaultVals.get(&quot;User&quot;);</span>
+<span class="fc" id="L238">            JSONArray roles = (JSONArray) defaultVals.get(&quot;Roles&quot;);</span>
+<span class="fc" id="L239">            JSONArray biomes = (JSONArray) defaultVals.get(&quot;Biomes&quot;);</span>
+<span class="fc" id="L240">            JSONArray plantTypes = (JSONArray) defaultVals.get(&quot;PlantTypes&quot;);</span>
+<span class="fc" id="L241">            JSONArray attributeCategories = (JSONArray) defaultVals.get(&quot;AttributeCategories&quot;);</span>
+
+<span class="fc" id="L243">            String userSql = &quot;INSERT INTO Users (Email, Username, Password, Security_question, Security_answer, RoleID) VALUES (?,?,?,?,?,?)&quot;;</span>
+<span class="fc" id="L244">            String roleSql = &quot;INSERT INTO Roles (RoleID, RoleName, RoleDescription) VALUES (?,?,?)&quot;;</span>
+<span class="fc" id="L245">            String biomeSql = &quot;INSERT INTO Biomes (BiomeName, BiomeDescription) VALUES (?,?)&quot;;</span>
+<span class="fc" id="L246">            String plantTypeSql = &quot;INSERT INTO PlantTypes (PlantTypeName, PlantTypeDesc) VALUES (?,?)&quot;;</span>
+<span class="fc" id="L247">            String attributeCategorySql = &quot;INSERT INTO AttributeCategories (AttributeCatName, AttributeCatDesc) VALUES (?,?)&quot;;</span>
+
+<span class="fc" id="L249">            Connection conn = null;</span>
+
+            try {
+<span class="fc" id="L252">                conn = DriverManager.getConnection(&quot;jdbc:sqlite:&quot; + filePath);</span>
+<span class="fc" id="L253">                PreparedStatement userStmt = conn.prepareStatement(userSql);</span>
+<span class="fc" id="L254">                PreparedStatement roleStmt = conn.prepareStatement(roleSql);</span>
+<span class="fc" id="L255">                PreparedStatement biomeStmt = conn.prepareStatement(biomeSql);</span>
+<span class="fc" id="L256">                PreparedStatement plantTypeStmt = conn.prepareStatement(plantTypeSql);</span>
+<span class="fc" id="L257">                PreparedStatement attributeCategoryStmt = conn.prepareStatement(</span>
+                    attributeCategorySql);
+
+                //Insert default values for users
+<span class="fc" id="L261">                userStmt.setString(1, (String) user.get(&quot;Email&quot;));</span>
+<span class="fc" id="L262">                userStmt.setString(2, (String) user.get(&quot;Username&quot;));</span>
+<span class="fc" id="L263">                PasswordHasher passwordHasher = new PasswordHasher((String) user.get(&quot;Password&quot;));</span>
+<span class="fc" id="L264">                String hashedPassword = passwordHasher.hash();</span>
+<span class="fc" id="L265">                userStmt.setString(3, hashedPassword);</span>
+<span class="fc" id="L266">                userStmt.setString(4, (String) user.get(&quot;SecurityQuestion&quot;));</span>
+<span class="fc" id="L267">                userStmt.setString(5, (String) user.get(&quot;SecurityAnswer&quot;));</span>
+<span class="fc" id="L268">                userStmt.setInt(6, (int) ((Long) user.get(&quot;RoleID&quot;)).intValue());</span>
+<span class="nc" id="L269">                userStmt.executeUpdate();</span>
+
+                //Insert default values for roles
+<span class="nc bnc" id="L272" title="All 2 branches missed.">                for (Object role : roles) {</span>
+<span class="nc" id="L273">                    JSONObject roleObj = (JSONObject) role;</span>
+<span class="nc" id="L274">                    roleStmt.setString(1, (String) roleObj.get(&quot;RoleID&quot;));</span>
+<span class="nc" id="L275">                    roleStmt.setString(2, (String) roleObj.get(&quot;RoleName&quot;));</span>
+<span class="nc" id="L276">                    roleStmt.setString(3, (String) roleObj.get(&quot;RoleDescription&quot;));</span>
+<span class="nc" id="L277">                    roleStmt.executeUpdate();</span>
+<span class="nc" id="L278">                }</span>
+
+                //Insert default values for biomes
+<span class="nc bnc" id="L281" title="All 2 branches missed.">                for (Object biome : biomes) {</span>
+<span class="nc" id="L282">                    JSONObject biomeObj = (JSONObject) biome;</span>
+<span class="nc" id="L283">                    biomeStmt.setString(1, (String) biomeObj.get(&quot;BiomeName&quot;));</span>
+<span class="nc" id="L284">                    biomeStmt.setString(2, (String) biomeObj.get(&quot;BiomeDescription&quot;));</span>
+<span class="nc" id="L285">                    biomeStmt.executeUpdate();</span>
+<span class="nc" id="L286">                }</span>
+
+                //Insert default values for plant types
+<span class="nc bnc" id="L289" title="All 2 branches missed.">                for (Object plantType : plantTypes) {</span>
+<span class="nc" id="L290">                    JSONObject plantTypeObj = (JSONObject) plantType;</span>
+<span class="nc" id="L291">                    plantTypeStmt.setString(1, (String) plantTypeObj.get(&quot;PlantTypeName&quot;));</span>
+<span class="nc" id="L292">                    plantTypeStmt.setString(2, (String) plantTypeObj.get(&quot;PlantTypeDescription&quot;));</span>
+<span class="nc" id="L293">                    plantTypeStmt.executeUpdate();</span>
+<span class="nc" id="L294">                }</span>
+
+                //Insert default values for attribute categories
+<span class="nc bnc" id="L297" title="All 2 branches missed.">                for (Object attributeCategory : attributeCategories) {</span>
+<span class="nc" id="L298">                    JSONObject attributeCategoryObj = (JSONObject) attributeCategory;</span>
+<span class="nc" id="L299">                    attributeCategoryStmt.setString(1,</span>
+<span class="nc" id="L300">                        (String) attributeCategoryObj.get(&quot;AttributeCategoryName&quot;));</span>
+<span class="nc" id="L301">                    attributeCategoryStmt.setString(2,</span>
+<span class="nc" id="L302">                        (String) attributeCategoryObj.get(&quot;AttributeCategoryDescription&quot;));</span>
+<span class="nc" id="L303">                }</span>
+<span class="fc" id="L304">            } catch (SQLException e) {</span>
+<span class="fc" id="L305">                System.out.println(e.getMessage());</span>
+<span class="nc" id="L306">            } catch (Exception e) {</span>
+<span class="nc" id="L307">                e.printStackTrace();</span>
+<span class="pc" id="L308">            }</span>
+
+<span class="nc" id="L310">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L311">            e.printStackTrace();</span>
+<span class="nc" id="L312">        } catch (Exception e) {</span>
+<span class="nc" id="L313">            e.printStackTrace();</span>
+<span class="pc" id="L314">        }</span>
+<span class="fc" id="L315">    }</span>
+
+    public User getUser(String usernameOrEmail) {
+<span class="fc" id="L318">        User user = null;</span>
+<span class="fc" id="L319">        String sql = &quot;SELECT * FROM Users WHERE Username = ? OR Email = ?&quot;;</span>
+
+        try {
+<span class="fc" id="L322">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L323">            stmt.setString(1, usernameOrEmail);</span>
+<span class="fc" id="L324">            stmt.setString(2, usernameOrEmail);</span>
+
+<span class="fc" id="L326">            ResultSet rs = stmt.executeQuery();</span>
+
+<span class="fc bfc" id="L328" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L329">                user = new User(rs.getInt(&quot;UserID&quot;), rs.getString(&quot;Username&quot;),</span>
+<span class="fc" id="L330">                    rs.getString(&quot;Password&quot;), rs.getString(&quot;Email&quot;), rs.getInt(&quot;RoleID&quot;),</span>
+<span class="fc" id="L331">                    rs.getString(&quot;Security_question&quot;), rs.getString(&quot;Security_answer&quot;));</span>
+            }
+<span class="nc" id="L333">        } catch (SQLException e) {</span>
+<span class="nc" id="L334">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L335">        } catch (Exception e) {</span>
+<span class="nc" id="L336">            e.printStackTrace();</span>
+<span class="pc" id="L337">        }</span>
+<span class="fc" id="L338">        return user;</span>
+    }
+
+    public User getUser(int id) {
+<span class="fc" id="L342">        User user = null;</span>
+<span class="fc" id="L343">        String sql = &quot;SELECT * FROM Users WHERE UserID = ?&quot;;</span>
+
+        try {
+<span class="fc" id="L346">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L347">            stmt.setInt(1, id);</span>
+
+<span class="fc" id="L349">            ResultSet rs = stmt.executeQuery();</span>
+
+<span class="fc bfc" id="L351" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L352">                user = new User(rs.getInt(&quot;UserID&quot;), rs.getString(&quot;Username&quot;),</span>
+<span class="fc" id="L353">                    rs.getString(&quot;Password&quot;), rs.getString(&quot;Email&quot;), rs.getInt(&quot;RoleID&quot;),</span>
+<span class="fc" id="L354">                    rs.getString(&quot;Security_question&quot;), rs.getString(&quot;Security_answer&quot;));</span>
+<span class="fc" id="L355">                System.out.println(&quot;creating user object here...&quot;);</span>
+            }
+<span class="nc" id="L357">        } catch (SQLException e) {</span>
+<span class="nc" id="L358">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L359">        } catch (Exception e) {</span>
+<span class="nc" id="L360">            e.printStackTrace();</span>
+<span class="pc" id="L361">        }</span>
+<span class="fc" id="L362">        return user;</span>
+    }
+
+    public User validateToken(String token) {
+<span class="fc" id="L366">        User foundUser = null; </span>
+<span class="fc" id="L367">        String sql = &quot;SELECT * FROM Sessions&quot;;</span>
+
+        try {
+<span class="fc" id="L370">            Date currDate = new Date(System.currentTimeMillis());</span>
+<span class="fc" id="L371">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L372">            ResultSet rs = stmt.executeQuery();</span>
+
+<span class="fc bfc" id="L374" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L375">                Token currToken = new Token(</span>
+<span class="fc" id="L376">                    Integer.parseInt(rs.getString(&quot;SessionID&quot;)),</span>
+<span class="fc" id="L377">                    Integer.parseInt(rs.getString(&quot;UserID&quot;)),</span>
+<span class="fc" id="L378">                    rs.getString(&quot;SessionToken&quot;),</span>
+<span class="fc" id="L379">                    new Date(Long.parseLong(rs.getString(&quot;ExpiryDate&quot;))),</span>
+<span class="pc bpc" id="L380" title="1 of 2 branches missed.">                    (Integer.parseInt(rs.getString(&quot;IsActive&quot;))) == 1</span>
+                );
+
+<span class="pc bpc" id="L383" title="1 of 2 branches missed.">                if (currDate.after(currToken.getExpiryDate())) {</span>
+<span class="fc" id="L384">                    String removeQry = &quot;DELETE FROM Sessions WHERE SessionToken=?&quot;;</span>
+<span class="fc" id="L385">                    PreparedStatement removeStmt = conn.prepareStatement(removeQry);</span>
+<span class="nc" id="L386">                    removeStmt.execute();</span>
+<span class="nc" id="L387">                    continue; </span>
+                }
+<span class="nc" id="L389">                User query_usr = this.getUser(currToken.getUserID());</span>
+<span class="nc bnc" id="L390" title="All 4 branches missed.">                if (query_usr != null &amp;&amp; foundUser == null) {</span>
+<span class="nc" id="L391">                    foundUser = query_usr;</span>
+                }
+<span class="nc" id="L393">            }</span>
+<span class="fc" id="L394">        } catch (SQLException e) {</span>
+<span class="fc" id="L395">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L396">        } catch (Exception e) {</span>
+<span class="nc" id="L397">            e.printStackTrace();</span>
+<span class="fc" id="L398">        }</span>
+
+<span class="fc" id="L400">        return foundUser;</span>
+    }
+
+    public User getUserId(String userName, String password) { //Might be redundent, could potentially be removed
+<span class="fc" id="L404">        User user = null; </span>
+<span class="fc" id="L405">        String sql = &quot;SELECT * FROM Users WHERE Username=? AND Password=?&quot;;</span>
+
+        try {
+<span class="fc" id="L408">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L409">            stmt.setString(1, userName);</span>
+
+            //PasswordHasher pwHasher = new PasswordHasher(password);
+            //stmt.setString(2, pwHasher.hash());
+<span class="fc" id="L413">            stmt.setString(2, password);</span>
+
+<span class="fc" id="L415">            ResultSet rs = stmt.executeQuery();</span>
+<span class="pc bpc" id="L416" title="1 of 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L417">                user = new User(rs.getInt(&quot;UserID&quot;), rs.getString(&quot;Username&quot;),</span>
+<span class="nc" id="L418">                    rs.getString(&quot;Password&quot;), rs.getString(&quot;Email&quot;), rs.getInt(&quot;RoleID&quot;),</span>
+<span class="nc" id="L419">                    rs.getString(&quot;Security_question&quot;), rs.getString(&quot;Security_answer&quot;));</span>
+            }
+<span class="nc" id="L421">        } catch (SQLException e) {</span>
+<span class="nc" id="L422">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L423">        } catch (Exception e) {</span>
+<span class="nc" id="L424">            e.printStackTrace();</span>
+<span class="pc" id="L425">        }</span>
+
+<span class="fc" id="L427">        return user;</span>
+    }
+
+    public boolean insertUser(User user) {
+<span class="fc" id="L431">        String sql = &quot;INSERT INTO Users (Email, Username, Password, Security_question, Security_answer, RoleID) VALUES (?,?,?,?,?,?)&quot;;</span>
+        try {
+<span class="fc" id="L433">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L434">            stmt.setString(1, user.getEmail());</span>
+<span class="fc" id="L435">            stmt.setString(2, user.getUsername());</span>
+            //PasswordHasher pwHasher = new PasswordHasher(user.getPassword());
+<span class="fc" id="L437">            stmt.setString(3, user.getPassword());</span>
+<span class="fc" id="L438">            stmt.setString(4, user.getSecurityQuestion());</span>
+<span class="fc" id="L439">            stmt.setString(5, user.getSecurityAnswer());</span>
+<span class="fc" id="L440">            stmt.setInt(6, user.getRole());</span>
+
+<span class="fc" id="L442">            int rowsInserted = stmt.executeUpdate();</span>
+<span class="pc bpc" id="L443" title="1 of 2 branches missed.">            return rowsInserted &gt; 0; // Return true if the insertion was successful</span>
+
+<span class="fc" id="L445">        } catch (SQLException e) {</span>
+<span class="fc" id="L446">            System.out.println(&quot;Error inserting user: &quot; + e.getMessage());</span>
+<span class="fc" id="L447">            return false; // Return false if an error occurred</span>
+<span class="nc" id="L448">        } catch (Exception e) {</span>
+<span class="nc" id="L449">            e.printStackTrace();</span>
+<span class="nc" id="L450">            return false; // Return false if another exception occurred</span>
+        }
+    }
+
+    public void insertUserFollowing(int userID, int followingUserID) {
+<span class="fc" id="L455">        String sql = &quot;INSERT INTO userFollowing (UserID, FollowingUserID) VALUES (?,?)&quot;;</span>
+
+        try {
+<span class="fc" id="L458">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L459">            stmt.setInt(1, userID);</span>
+<span class="fc" id="L460">            stmt.setInt(2, followingUserID);</span>
+<span class="fc" id="L461">            stmt.executeUpdate();</span>
+<span class="nc" id="L462">        } catch (SQLException e) {</span>
+<span class="nc" id="L463">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L464">        } catch (Exception e) {</span>
+<span class="nc" id="L465">            e.printStackTrace();</span>
+<span class="pc" id="L466">        }</span>
+<span class="fc" id="L467">    }</span>
+
+    public void updatePassword(int userID, String password) {
+<span class="fc" id="L470">        String sql = &quot;UPDATE Users SET Password = ? WHERE UserID = ?&quot;;</span>
+        try {
+<span class="fc" id="L472">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L473">            stmt.setString(1, password);</span>
+<span class="fc" id="L474">            stmt.setInt(2, userID);</span>
+<span class="nc" id="L475">            stmt.executeUpdate();</span>
+<span class="fc" id="L476">        } catch (SQLException e) {</span>
+<span class="fc" id="L477">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L478">        } catch (Exception e) {</span>
+<span class="nc" id="L479">            e.printStackTrace();</span>
+<span class="pc" id="L480">        }</span>
+<span class="fc" id="L481">    }</span>
+
+    public boolean updateUser(int id, User user){
+<span class="fc" id="L484">        String sql = &quot;UPDATE Users SET Email = ?, Username = ?, Password = ?, Security_question = ?, &quot; +</span>
+            &quot;Security_answer = ?, RoleID = ? WHERE UserID = ?&quot;;
+        try {
+<span class="fc" id="L487">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L488">            stmt.setString(1, user.getEmail());</span>
+<span class="fc" id="L489">            stmt.setString(2, user.getUsername());</span>
+<span class="fc" id="L490">            PasswordHasher pwHasher = new PasswordHasher(user.getPassword());</span>
+<span class="fc" id="L491">            stmt.setString(3, pwHasher.hash());</span>
+<span class="fc" id="L492">            stmt.setString(4, user.getSecurityQuestion());</span>
+<span class="fc" id="L493">            stmt.setString(5, user.getSecurityAnswer());</span>
+<span class="fc" id="L494">            stmt.setInt(6, user.getRole());</span>
+<span class="fc" id="L495">            stmt.setInt(7, id);</span>
+<span class="fc" id="L496">            int updated = stmt.executeUpdate();</span>
+
+<span class="pc bpc" id="L498" title="1 of 2 branches missed.">            return updated &gt; 0;</span>
+<span class="fc" id="L499">        } catch (SQLException e) {</span>
+<span class="fc" id="L500">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L501">            return false;</span>
+<span class="nc" id="L502">        } catch (Exception e) {</span>
+<span class="nc" id="L503">            e.printStackTrace();</span>
+<span class="nc" id="L504">            return false;</span>
+        }
+    }
+
+    public boolean deleteUser(int id) {
+<span class="fc" id="L509">        String sql = &quot;DELETE FROM Users WHERE UserID = ?&quot;;</span>
+        try {
+<span class="fc" id="L511">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L512">            stmt.setInt(1, id);</span>
+
+<span class="nc" id="L514">            int rowsDeleted = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L515" title="All 2 branches missed.">            return rowsDeleted &gt; 0; // Return true if a user was deleted</span>
+
+<span class="fc" id="L517">        } catch (SQLException e) {</span>
+<span class="fc" id="L518">            System.out.println(&quot;Error deleting user: &quot; + e.getMessage());</span>
+<span class="fc" id="L519">            return false; // Return false if an error occurred</span>
+        }
+    }
+
+    public JSONObject getSightingByID(int sightingID) {
+<span class="fc" id="L524">        JSONObject pokemonInstance = null;</span>
+<span class="fc" id="L525">        String sql = &quot;SELECT &quot; +</span>
+                    &quot;    Pokemon.PokemonID, &quot; +
+                    &quot;    PokemonSightings.Longitude as Longitude, &quot; + //
+                    &quot;    PokemonSightings.Latitude as Latitude, &quot; + //
+                    &quot;    PokemonSightings.FoundDate, &quot; + //
+                    &quot;    Pokemon.PokemonName, &quot; + //
+                    &quot;    SpeciesName, &quot; + //
+                    &quot;    HP, &quot; + //
+                    &quot;    AttackDesc, &quot; + //
+                    &quot;    DefenseDesc, &quot; + //
+                    &quot;    TaxonomicCategory, &quot; + //
+                    &quot;    PlantTypeName ,&quot; + //
+                    &quot;    PlantTypeDesc &quot; + //
+                    &quot;FROM Pokemon&quot; + //
+                    &quot;    JOIN PlantTypes &quot; + //
+                    &quot;        ON Pokemon.PlantType = PlantTypes.PlantTypeID &quot; + //
+                    &quot;    JOIN PokemonSightings &quot; + //
+                    &quot;        ON PokemonSightings.PokemonID = Pokemon.PokemonID &quot; + //
+                    &quot;WHERE &quot; + //
+                    &quot;    PokemonSightings.SightingID = ? &quot;;
+
+        try {
+<span class="fc" id="L547">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L548">            stmt.setString(1, String.valueOf(sightingID));</span>
+
+<span class="fc" id="L550">            ResultSet rs = stmt.executeQuery();</span>
+<span class="fc bfc" id="L551" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L552">                pokemonInstance = new JSONObject();</span>
+
+<span class="fc" id="L554">                pokemonInstance.put(&quot;PokemonID&quot;, rs.getInt(&quot;PokemonID&quot;));</span>
+<span class="fc" id="L555">                pokemonInstance.put(&quot;Longitude&quot;, rs.getDouble(&quot;Longitude&quot;));</span>
+<span class="fc" id="L556">                pokemonInstance.put(&quot;Latitude&quot;, rs.getDouble(&quot;Latitude&quot;));</span>
+<span class="fc" id="L557">                pokemonInstance.put(&quot;FoundDate&quot;, rs.getLong(&quot;FoundDate&quot;));</span>
+<span class="fc" id="L558">                pokemonInstance.put(&quot;PokemonName&quot;, rs.getString(&quot;PokemonName&quot;));</span>
+<span class="fc" id="L559">                pokemonInstance.put(&quot;SpeciesName&quot;, rs.getString(&quot;SpeciesName&quot;));</span>
+<span class="fc" id="L560">                pokemonInstance.put(&quot;HP&quot;, rs.getInt(&quot;HP&quot;));</span>
+<span class="fc" id="L561">                pokemonInstance.put(&quot;AttackDesc&quot;, rs.getString(&quot;AttackDesc&quot;));</span>
+<span class="fc" id="L562">                pokemonInstance.put(&quot;DefenseDesc&quot;, rs.getString(&quot;DefenseDesc&quot;));</span>
+<span class="fc" id="L563">                pokemonInstance.put(&quot;TaxonomicCategory&quot;, rs.getString(&quot;TaxonomicCategory&quot;));</span>
+<span class="fc" id="L564">                pokemonInstance.put(&quot;PlantTypeName&quot;, rs.getString(&quot;PlantTypeName&quot;));</span>
+<span class="fc" id="L565">                pokemonInstance.put(&quot;PlantTypeDesc&quot;, rs.getString(&quot;PlantTypeDesc&quot;));         </span>
+            }
+<span class="nc" id="L567">        } catch (SQLException e) {</span>
+<span class="nc" id="L568">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L569">        } catch (Exception e) {</span>
+<span class="nc" id="L570">            e.printStackTrace();</span>
+<span class="pc" id="L571">        }</span>
+
+<span class="fc" id="L573">        return pokemonInstance;</span>
+    }
+    
+    public JSONArray getDexByUserID(int userId) {
+<span class="fc" id="L577">        JSONArray dexItems = new JSONArray();</span>
+<span class="fc" id="L578">        String sql = &quot;SELECT &quot; +</span>
+                    &quot;    PokemonSightings.SightingID, &quot; +
+                    &quot;    PokemonSightings.Longitude as Longitude, &quot; + //
+                    &quot;    PokemonSightings.Latitude as Latitude, &quot; + //
+                    &quot;    PokemonSightings.FoundDate, &quot; + //
+                    &quot;    Pokemon.PokemonName, &quot; + //
+                    &quot;    SpeciesName, &quot; + //
+                    &quot;    HP, &quot; + //
+                    &quot;    AttackDesc, &quot; + //
+                    &quot;    DefenseDesc, &quot; + //
+                    &quot;    TaxonomicCategory, &quot; + //
+                    &quot;    PlantTypeName ,&quot; + //
+                    &quot;    PlantTypeDesc &quot; + //
+                    &quot;FROM Pokemon&quot; + //
+                    &quot;    JOIN PlantTypes &quot; + //
+                    &quot;        ON Pokemon.PlantType = PlantTypes.PlantTypeID &quot; + //
+                    &quot;    JOIN PokemonSightings &quot; + //
+                    &quot;        ON PokemonSightings.PokemonID = Pokemon.PokemonID &quot; + //
+                    &quot;WHERE &quot; + //
+                    &quot;    PokemonSightings.UserID = ? &quot;;
+
+        try {
+<span class="fc" id="L600">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L601">            stmt.setInt(1, userId);</span>
+
+<span class="fc" id="L603">            ResultSet rs = stmt.executeQuery();</span>
+<span class="fc bfc" id="L604" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L605">                JSONObject pokemonInstance = new JSONObject();</span>
+<span class="fc" id="L606">                pokemonInstance.put(&quot;SightingID&quot;, rs.getInt(&quot;SightingID&quot;));</span>
+<span class="fc" id="L607">                pokemonInstance.put(&quot;Longitude&quot;, rs.getDouble(&quot;Longitude&quot;));</span>
+<span class="fc" id="L608">                pokemonInstance.put(&quot;Latitude&quot;, rs.getDouble(&quot;Latitude&quot;));</span>
+<span class="fc" id="L609">                pokemonInstance.put(&quot;FoundDate&quot;, rs.getLong(&quot;FoundDate&quot;));</span>
+<span class="fc" id="L610">                pokemonInstance.put(&quot;PokemonName&quot;, rs.getString(&quot;PokemonName&quot;));</span>
+<span class="fc" id="L611">                pokemonInstance.put(&quot;SpeciesName&quot;, rs.getString(&quot;SpeciesName&quot;));</span>
+<span class="fc" id="L612">                pokemonInstance.put(&quot;HP&quot;, rs.getInt(&quot;HP&quot;));</span>
+<span class="fc" id="L613">                pokemonInstance.put(&quot;AttackDesc&quot;, rs.getString(&quot;AttackDesc&quot;));</span>
+<span class="fc" id="L614">                pokemonInstance.put(&quot;DefenseDesc&quot;, rs.getString(&quot;DefenseDesc&quot;));</span>
+<span class="fc" id="L615">                pokemonInstance.put(&quot;TaxonomicCategory&quot;, rs.getString(&quot;TaxonomicCategory&quot;));</span>
+<span class="fc" id="L616">                pokemonInstance.put(&quot;PlantTypeName&quot;, rs.getString(&quot;PlantTypeName&quot;));</span>
+<span class="fc" id="L617">                pokemonInstance.put(&quot;PlantTypeDesc&quot;, rs.getString(&quot;PlantTypeDesc&quot;));</span>
+
+<span class="fc" id="L619">                dexItems.add(pokemonInstance);</span>
+<span class="fc" id="L620">            }</span>
+<span class="nc" id="L621">        } catch (SQLException e) {</span>
+<span class="nc" id="L622">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L623">        } catch (Exception e) {</span>
+<span class="nc" id="L624">            e.printStackTrace();</span>
+<span class="pc" id="L625">        }</span>
+
+<span class="fc" id="L627">        return dexItems;</span>
+    }
+
+    public Pokemon getPokemon(Integer pokemonID, String pokemonName) {
+<span class="fc" id="L631">        String sql = null;</span>
+<span class="fc" id="L632">        Pokemon pokemon = null;</span>
+<span class="fc" id="L633">        ResultSet rs = null;</span>
+
+        try {
+            // Determine query based on input
+<span class="fc bfc" id="L637" title="All 2 branches covered.">            if (pokemonID != null) {</span>
+                // Query by ID if ID is provided
+<span class="fc" id="L639">                sql = &quot;SELECT * FROM Pokemon WHERE PokemonID = ?&quot;;</span>
+<span class="fc" id="L640">                PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L641">                stmt.setInt(1, pokemonID);</span>
+<span class="fc" id="L642">                rs = stmt.executeQuery();</span>
+<span class="pc bpc" id="L643" title="1 of 2 branches missed.">            } else if (pokemonName != null) {</span>
+                // Query by name if ID is not provided and name is provided
+<span class="fc" id="L645">                sql = &quot;SELECT * FROM Pokemon WHERE PokemonName = ?&quot;;</span>
+<span class="fc" id="L646">                PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L647">                stmt.setString(1, pokemonName);</span>
+<span class="fc" id="L648">                rs = stmt.executeQuery();</span>
+            }
+
+            // Process the result
+<span class="pc bpc" id="L652" title="2 of 4 branches missed.">            if (rs != null &amp;&amp; rs.next()) {</span>
+<span class="fc" id="L653">                pokemon = new Pokemon(</span>
+<span class="fc" id="L654">                    rs.getInt(&quot;PokemonID&quot;),</span>
+<span class="fc" id="L655">                    rs.getString(&quot;PokemonName&quot;),</span>
+<span class="fc" id="L656">                    rs.getInt(&quot;PlantType&quot;),</span>
+<span class="fc" id="L657">                    rs.getString(&quot;SpeciesName&quot;),</span>
+<span class="fc" id="L658">                    rs.getInt(&quot;HP&quot;),</span>
+<span class="fc" id="L659">                    rs.getInt(&quot;AttackCategory&quot;),</span>
+<span class="fc" id="L660">                    rs.getString(&quot;AttackDesc&quot;),</span>
+<span class="fc" id="L661">                    rs.getInt(&quot;DefenseCategory&quot;),</span>
+<span class="fc" id="L662">                    rs.getString(&quot;DefenseDesc&quot;),</span>
+<span class="fc" id="L663">                    rs.getString(&quot;TaxonomicCategory&quot;)</span>
+                );
+            }
+
+<span class="nc" id="L667">        } catch (SQLException e) {</span>
+<span class="nc" id="L668">            System.out.println(&quot;Error fetching Pokemon: &quot; + e.getMessage());</span>
+<span class="nc" id="L669">        } catch (Exception e) {</span>
+<span class="nc" id="L670">            e.printStackTrace();</span>
+<span class="pc" id="L671">        }</span>
+
+<span class="fc" id="L673">        return pokemon;</span>
+    }
+
+    public Pokemon getPokemon(int pokemonID, String pokemonName) {
+<span class="fc" id="L677">        String sql = &quot;SELECT * FROM Pokemon WHERE PokemonID = ? OR PokemonName = ?&quot;;</span>
+<span class="fc" id="L678">        Pokemon pokemon = null;</span>
+        try {
+<span class="fc" id="L680">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L681">            stmt.setInt(1, pokemonID);</span>
+<span class="fc" id="L682">            stmt.setString(2, pokemonName);</span>
+
+<span class="fc" id="L684">            ResultSet rs = stmt.executeQuery();</span>
+
+<span class="fc bfc" id="L686" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L687">                pokemon = new Pokemon(rs.getInt(&quot;PokemonID&quot;),</span>
+<span class="fc" id="L688">                    rs.getString(&quot;PokemonName&quot;),</span>
+<span class="fc" id="L689">                    rs.getInt(&quot;PlantType&quot;),</span>
+<span class="fc" id="L690">                    rs.getString(&quot;SpeciesName&quot;),</span>
+<span class="fc" id="L691">                    rs.getInt(&quot;HP&quot;),</span>
+<span class="fc" id="L692">                    rs.getInt(&quot;AttackCategory&quot;),</span>
+<span class="fc" id="L693">                    rs.getString(&quot;AttackDesc&quot;),</span>
+<span class="fc" id="L694">                    rs.getInt(&quot;DefenseCategory&quot;),</span>
+<span class="fc" id="L695">                    rs.getString(&quot;DefenseDesc&quot;),</span>
+<span class="fc" id="L696">                    rs.getString(&quot;TaxonomicCategory&quot;));</span>
+
+            }
+<span class="nc" id="L699">        } catch (SQLException e) {</span>
+<span class="nc" id="L700">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L701">        } catch (Exception e) {</span>
+<span class="nc" id="L702">            e.printStackTrace();</span>
+<span class="pc" id="L703">        }</span>
+<span class="fc" id="L704">        return pokemon;</span>
+    }
+
+    public boolean insertPokemon(Pokemon pokemon) {
+<span class="fc" id="L708">        String sql = &quot;INSERT INTO Pokemon (PokemonName, PlantType, SpeciesName, HP, AttackCategory, AttackDesc, DefenseCategory, DefenseDesc, TaxonomicCategory) &quot; +</span>
+            &quot;VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;;
+        try {
+<span class="fc" id="L711">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L712">            stmt.setString(1, pokemon.getPokemonName());</span>
+<span class="fc" id="L713">            stmt.setInt(2, pokemon.getPlantType());</span>
+<span class="fc" id="L714">            stmt.setString(3, pokemon.getSpeciesName());</span>
+<span class="fc" id="L715">            stmt.setInt(4, pokemon.getHP());</span>
+<span class="fc" id="L716">            stmt.setInt(5, pokemon.getAttackCategory());</span>
+<span class="fc" id="L717">            stmt.setString(6, pokemon.getAttackDescription());</span>
+<span class="fc" id="L718">            stmt.setInt(7, pokemon.getDefenseCategory());</span>
+<span class="fc" id="L719">            stmt.setString(8, pokemon.getDefenseDescription());</span>
+<span class="fc" id="L720">            stmt.setString(9, pokemon.getTaxonomicCategory());</span>
+
+<span class="nc" id="L722">            int rowsInserted = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L723" title="All 2 branches missed.">            return rowsInserted &gt; 0;</span>
+
+<span class="fc" id="L725">        } catch (SQLException e) {</span>
+<span class="fc" id="L726">            System.out.println(&quot;Error inserting Pokemon: &quot; + e.getMessage());</span>
+<span class="fc" id="L727">            return false;</span>
+        }
+    }
+
+    public boolean updatePokemon(int id, Pokemon pokemon) {
+<span class="fc" id="L732">        String sql = &quot;UPDATE Pokemon SET PokemonName = ?, PlantType = ?, SpeciesName = ?, HP = ?, AttackCategory = ?, AttackDesc = ?, &quot; +</span>
+            &quot;DefenseCategory = ?, DefenseDesc = ?, TaxonomicCategory = ? WHERE PokemonID = ?&quot;;
+
+        try {
+<span class="fc" id="L736">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L737">            stmt.setString(1, pokemon.getPokemonName());</span>
+<span class="fc" id="L738">            stmt.setInt(2, pokemon.getPlantType());</span>
+<span class="fc" id="L739">            stmt.setString(3, pokemon.getSpeciesName());</span>
+<span class="fc" id="L740">            stmt.setInt(4, pokemon.getHP());</span>
+<span class="fc" id="L741">            stmt.setInt(5, pokemon.getAttackCategory());</span>
+<span class="fc" id="L742">            stmt.setString(6, pokemon.getAttackDescription());</span>
+<span class="fc" id="L743">            stmt.setInt(7, pokemon.getDefenseCategory());</span>
+<span class="fc" id="L744">            stmt.setString(8, pokemon.getDefenseDescription());</span>
+<span class="fc" id="L745">            stmt.setString(9, pokemon.getTaxonomicCategory());</span>
+<span class="fc" id="L746">            stmt.setInt(10, id);</span>
+
+<span class="nc" id="L748">            int rowsUpdated = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L749" title="All 2 branches missed.">            return rowsUpdated &gt; 0;</span>
+
+<span class="fc" id="L751">        } catch (SQLException e) {</span>
+<span class="fc" id="L752">            System.out.println(&quot;Error updating Pokemon: &quot; + e.getMessage());</span>
+<span class="fc" id="L753">            return false;</span>
+        }
+    }
+
+    public ArrayList&lt;PokemonSighting&gt; getUsersPokemonSightings(int userID) {
+<span class="fc" id="L758">        String sql = &quot;SELECT * FROM PokemonSightings WHERE UserID = ?&quot;;</span>
+
+<span class="fc" id="L760">        ArrayList&lt;PokemonSighting&gt; pokemonSightings = new ArrayList&lt;&gt;();</span>
+        try {
+<span class="fc" id="L762">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L763">            stmt.setInt(1, userID);</span>
+
+<span class="fc" id="L765">            ResultSet rs = stmt.executeQuery();</span>
+
+<span class="fc bfc" id="L767" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L768">                pokemonSightings.add(new PokemonSighting(rs.getInt(&quot;SightingID&quot;),</span>
+<span class="fc" id="L769">                    rs.getInt(&quot;PokemonID&quot;),</span>
+<span class="fc" id="L770">                    rs.getInt(&quot;UserID&quot;),</span>
+<span class="fc" id="L771">                    rs.getInt(&quot;BiomeID&quot;),</span>
+<span class="fc" id="L772">                    rs.getDouble(&quot;Longitude&quot;),</span>
+<span class="fc" id="L773">                    rs.getDouble(&quot;Latitude&quot;),</span>
+<span class="fc" id="L774">                    rs.getDate(&quot;FoundDate&quot;))</span>
+                );
+            }
+<span class="nc" id="L777">        } catch (SQLException e) {</span>
+<span class="nc" id="L778">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L779">        } catch (Exception e) {</span>
+<span class="nc" id="L780">            e.printStackTrace();</span>
+<span class="pc" id="L781">        }</span>
+<span class="fc" id="L782">        return pokemonSightings;</span>
+    }
+
+<span class="fc" id="L785">    public ArrayList&lt;LeaderboardEntry&gt; getLeaderboard() {String sql = &quot;SELECT &quot; +</span>
+        &quot;    u.Username, &quot; +
+        &quot;    COUNT(ps.SightingID) AS sightingsCount, &quot; +
+        &quot;    ps2.SightingID, &quot; +
+        &quot;    ps2.UserID, &quot; +
+        &quot;    ps2.PokemonID, &quot; +
+        &quot;    ps2.BiomeID, &quot; +
+        &quot;    ps2.Longitude, &quot; +
+        &quot;    ps2.Latitude, &quot; +
+        &quot;    ps2.FoundDate &quot; +
+        &quot;FROM &quot; +
+        &quot;    Users u &quot; +
+        &quot;LEFT JOIN &quot; +
+        &quot;    PokemonSightings ps ON u.UserID = ps.UserID &quot; +
+        &quot;LEFT JOIN &quot; +
+        &quot;    ( &quot; +
+        &quot;        SELECT &quot; +
+        &quot;            ps1.UserID, &quot; +
+        &quot;            ps1.SightingID, &quot; +
+        &quot;            ps1.PokemonID, &quot; +
+        &quot;            ps1.BiomeID, &quot; +
+        &quot;            ps1.Longitude, &quot; +
+        &quot;            ps1.Latitude, &quot; +
+        &quot;            ps1.FoundDate &quot; +
+        &quot;        FROM &quot; +
+        &quot;            PokemonSightings ps1 &quot; +
+        &quot;        WHERE &quot; +
+        &quot;            ps1.FoundDate = (SELECT MAX(ps2.FoundDate) &quot; +
+        &quot;                             FROM PokemonSightings ps2 &quot; +
+        &quot;                             WHERE ps2.UserID = ps1.UserID) &quot; +
+        &quot;    ) ps2 ON u.UserID = ps2.UserID &quot; +
+        &quot;GROUP BY &quot; +
+        &quot;    u.UserID, u.Username &quot; +
+        &quot;ORDER BY &quot; +
+        &quot;    sightingsCount DESC;&quot;;
+
+<span class="fc" id="L821">        ArrayList&lt;LeaderboardEntry&gt; leaderboardEntries = new ArrayList&lt;LeaderboardEntry&gt;();</span>
+        try {
+<span class="fc" id="L823">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L824">            ResultSet rs = stmt.executeQuery();</span>
+
+<span class="pc bpc" id="L826" title="1 of 2 branches missed.">            while (rs.next()) {</span>
+<span class="pc bpc" id="L827" title="1 of 2 branches missed.">                if (rs.getInt(&quot;sightingsCount&quot;) != 0) {</span>
+<span class="pc" id="L828">                    leaderboardEntries.add(new LeaderboardEntry(</span>
+<span class="fc" id="L829">                            rs.getString(&quot;Username&quot;),</span>
+<span class="fc" id="L830">                            rs.getInt(&quot;sightingsCount&quot;),</span>
+                            new PokemonSighting(
+<span class="fc" id="L832">                                rs.getInt(&quot;SightingID&quot;),</span>
+<span class="fc" id="L833">                                rs.getInt(&quot;PokemonID&quot;),</span>
+<span class="fc" id="L834">                                rs.getInt(&quot;UserID&quot;),</span>
+<span class="fc" id="L835">                                rs.getInt(&quot;BiomeID&quot;),</span>
+<span class="fc" id="L836">                                rs.getDouble(&quot;Longitude&quot;),</span>
+<span class="fc" id="L837">                                rs.getDouble(&quot;Latitude&quot;),</span>
+<span class="nc" id="L838">                                new Date(Integer.parseInt(rs.getString(&quot;FoundDate&quot;)))</span>
+                            )
+                    ));
+                } else {
+<span class="nc" id="L842">                    leaderboardEntries.add(new LeaderboardEntry(</span>
+<span class="nc" id="L843">                        rs.getString(&quot;Username&quot;),</span>
+<span class="nc" id="L844">                        rs.getInt(&quot;sightingsCount&quot;),</span>
+                        null
+                    ));
+                }
+
+            }
+<span class="nc" id="L850">        } catch (SQLException e) {</span>
+<span class="nc" id="L851">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L852">        } catch (Exception e) {</span>
+<span class="fc" id="L853">            e.printStackTrace();</span>
+<span class="nc" id="L854">        }</span>
+<span class="fc" id="L855">        return leaderboardEntries;</span>
+    }
+
+    public void insertPokemonData() {
+<span class="fc" id="L859">        String insertPokemonSql =</span>
+            &quot;INSERT INTO Pokemon (PokemonID, PokemonName, PlantType, SpeciesName, HP, &quot; +
+                &quot;AttackCategory, AttackDesc, DefenseCategory, DefenseDesc, TaxonomicCategory) &quot; +
+                &quot;VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;;
+<span class="fc" id="L863">        try (PreparedStatement pstmt = conn.prepareStatement(insertPokemonSql)) {</span>
+            // Example data for the Pokemon table
+<span class="fc" id="L865">            int[] pokemonIDs = {1, 2, 3, 4};</span>
+<span class="fc" id="L866">            String[] pokemonNames = {&quot;Bulbasaur&quot;, &quot;Ivysaur&quot;, &quot;Venusaur&quot;, &quot;NewPokemnon&quot;};</span>
+<span class="fc" id="L867">            int[] plantTypes = {1, 1, 1,</span>
+                1}; // Assuming all belong to PlantTypeID = 1 (e.g., &quot;Grass/Poison&quot;)
+<span class="fc" id="L869">            String[] speciesNames = {&quot;Seed&quot;, &quot;Seed&quot;, &quot;Seed&quot;, &quot;Seed&quot;};</span>
+<span class="fc" id="L870">            int[] HPs = {45, 60, 80, 1000};</span>
+<span class="fc" id="L871">            int[] attackCategories = {1, 2, 3,</span>
+                4}; // Assuming these match AttributeCatID values for Attack
+<span class="fc" id="L873">            String[] attackDescriptions = {</span>
+                &quot;Sharp-edged leaves are launched to slash at the opposing Pokémon.&quot;,
+                &quot;Whips the foe with slender vines.&quot;,
+                &quot;A large blast of solar energy is unleashed.&quot;,
+                &quot;blah&quot;
+            };
+<span class="fc" id="L879">            int[] defenseCategories = {1, 2, 3,</span>
+                4}; // Assuming these match AttributeCatID values for Defense
+<span class="fc" id="L881">            String[] defenseDescriptions = {&quot;Boosts the power of Grass-type moves when HP is low.&quot;,</span>
+                &quot;Boosts the power of Grass-type moves when HP is low.&quot;,
+                &quot;Boosts the power of Grass-type moves when HP is low.&quot;,
+                &quot;blah&quot;
+            };
+<span class="fc" id="L886">            String[] taxonomicCategories = {&quot;Seed Pokémon&quot;, &quot;Seed Pokémon&quot;, &quot;Seed Pokémon&quot;,</span>
+                &quot;Seed Pokemon&quot;};
+
+            // Loop through and insert data
+<span class="pc bpc" id="L890" title="1 of 2 branches missed.">            for (int i = 0; i &lt; pokemonIDs.length; i++) {</span>
+<span class="fc" id="L891">                pstmt.setInt(1, pokemonIDs[i]); // Set PokemonID</span>
+<span class="fc" id="L892">                pstmt.setString(2, pokemonNames[i]); // Set PokemonName</span>
+<span class="fc" id="L893">                pstmt.setInt(3, plantTypes[i]); // Set PlantType (Foreign Key)</span>
+<span class="fc" id="L894">                pstmt.setString(4, speciesNames[i]); // Set SpeciesName</span>
+<span class="fc" id="L895">                pstmt.setInt(5, HPs[i]); // Set HP</span>
+<span class="fc" id="L896">                pstmt.setInt(6, attackCategories[i]); // Set AttackCategory (Foreign Key)</span>
+<span class="fc" id="L897">                pstmt.setString(7, attackDescriptions[i]); // Set AttackDesc</span>
+<span class="fc" id="L898">                pstmt.setInt(8, defenseCategories[i]); // Set DefenseCategory (Foreign Key)</span>
+<span class="fc" id="L899">                pstmt.setString(9, defenseDescriptions[i]); // Set DefenseDesc</span>
+<span class="fc" id="L900">                pstmt.setString(10, taxonomicCategories[i]); // Set TaxonomicCategory</span>
+<span class="nc" id="L901">                pstmt.executeUpdate(); // Execute the INSERT statement</span>
+            }
+
+<span class="nc" id="L904">            System.out.println(&quot;Pokemon data has been inserted successfully.&quot;);</span>
+
+<span class="fc" id="L906">        } catch (SQLException e) {</span>
+<span class="fc" id="L907">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L908">        }</span>
+<span class="fc" id="L909">    }</span>
+
+    public void insertPokemonSightingsData() {
+        // SQL INSERT statement for the PokemonSightings table
+<span class="fc" id="L913">        String insertSightingSql =</span>
+            &quot;INSERT INTO PokemonSightings (SightingID, UserID, PokemonID, BiomeID, Longitude, Latitude, FoundDate) &quot;
+                + &quot;VALUES (?, ?, ?, ?, ?, ?, ?)&quot;;
+
+<span class="fc" id="L917">        try (PreparedStatement pstmt = conn.prepareStatement(insertSightingSql)) {</span>
+
+            // Example data for the PokemonSightings table
+<span class="fc" id="L920">            int[] sightingIDs_1 = {1, 2, 3}; // Unique IDs for each sighting</span>
+<span class="fc" id="L921">            int[] sightingIDs_2 = {4, 5, 6, 7}; // Unique IDs for each sighting</span>
+
+<span class="fc" id="L923">            int userID_1 = 1; // Assuming a single user with UserID = 1</span>
+<span class="fc" id="L924">            int userID_2 = 2; // Assuming a single user with UserID = 2</span>
+<span class="fc" id="L925">            int[] pokemonIDs = {1, 2, 3, 4}; // Corresponding to Bulbasaur, Ivysaur, Venusaur</span>
+<span class="fc" id="L926">            int[] biomeIDs = {1, 2, 3, 4}; // Adjusted Biome IDs</span>
+<span class="fc" id="L927">            double[] longitudes = {-73.935242, -0.127758, -122.419418,</span>
+                -122.419418,}; // Example longitudes
+<span class="fc" id="L929">            double[] latitudes = {40.730610, 51.507351, 37.774929, 37.774929}; // Example latitudes</span>
+
+            // Directly create an array of Timestamps
+<span class="fc" id="L932">            Timestamp[] foundDates_1 = {</span>
+<span class="fc" id="L933">                Timestamp.valueOf(&quot;2024-09-01 14:30:00&quot;),</span>
+<span class="fc" id="L934">                Timestamp.valueOf(&quot;2024-08-25 10:00:00&quot;),</span>
+<span class="fc" id="L935">                Timestamp.valueOf(&quot;2024-07-15 09:15:00&quot;)</span>
+            };
+
+<span class="fc" id="L938">            Timestamp[] foundDates_2 = {</span>
+<span class="fc" id="L939">                Timestamp.valueOf(&quot;2024-09-01 14:30:00&quot;),</span>
+<span class="fc" id="L940">                Timestamp.valueOf(&quot;2024-08-25 10:00:00&quot;),</span>
+<span class="fc" id="L941">                Timestamp.valueOf(&quot;2024-07-15 09:15:00&quot;),</span>
+<span class="fc" id="L942">                Timestamp.valueOf(&quot;2025-07-15 09:15:00&quot;)</span>
+            };
+
+            // Loop through and insert data
+<span class="pc bpc" id="L946" title="1 of 2 branches missed.">            for (int i = 0; i &lt; sightingIDs_1.length; i++) {</span>
+<span class="fc" id="L947">                pstmt.setInt(1, sightingIDs_1[i]); // Set SightingID</span>
+<span class="fc" id="L948">                pstmt.setInt(2, userID_1); // Set UserID (assuming 1 user)</span>
+<span class="fc" id="L949">                pstmt.setInt(3, pokemonIDs[i]); // Set PokemonID</span>
+<span class="fc" id="L950">                pstmt.setInt(4, biomeIDs[i]); // Set BiomeID</span>
+<span class="fc" id="L951">                pstmt.setDouble(5, longitudes[i]); // Set Longitude</span>
+<span class="fc" id="L952">                pstmt.setDouble(6, latitudes[i]); // Set Latitude</span>
+<span class="fc" id="L953">                pstmt.setTimestamp(7, foundDates_1[i]); // Set FoundDate</span>
+<span class="nc" id="L954">                pstmt.executeUpdate(); // Execute the INSERT statement</span>
+            }
+
+//            // Loop through and insert data
+<span class="nc bnc" id="L958" title="All 2 branches missed.">            for (int i = 0; i &lt; sightingIDs_2.length; i++) {</span>
+<span class="nc" id="L959">                pstmt.setInt(1, sightingIDs_2[i]); // Set SightingID</span>
+<span class="nc" id="L960">                pstmt.setInt(2, userID_2); // Set UserID (assuming 1 user)</span>
+<span class="nc" id="L961">                pstmt.setInt(3, pokemonIDs[i]); // Set PokemonID</span>
+<span class="nc" id="L962">                pstmt.setInt(4, biomeIDs[i]); // Set BiomeID</span>
+<span class="nc" id="L963">                pstmt.setDouble(5, longitudes[i]); // Set Longitude</span>
+<span class="nc" id="L964">                pstmt.setDouble(6, latitudes[i]); // Set Latitude</span>
+<span class="nc" id="L965">                pstmt.setTimestamp(7, foundDates_2[i]); // Set FoundDate</span>
+<span class="nc" id="L966">                pstmt.executeUpdate(); // Execute the INSERT statement</span>
+            }
+
+<span class="nc" id="L969">            System.out.println(&quot;PokemonSightings data has been inserted successfully.&quot;);</span>
+
+<span class="fc" id="L971">        } catch (SQLException e) {</span>
+<span class="fc" id="L972">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L973">        }</span>
+<span class="fc" id="L974">    }</span>
+
+    public boolean deletePokemon(int id) {
+<span class="fc" id="L977">        String sql = &quot;DELETE FROM Pokemon WHERE PokemonID = ?&quot;;</span>
+        try {
+<span class="fc" id="L979">            PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L980">            stmt.setInt(1, id);</span>
+
+<span class="nc" id="L982">            int rowsDeleted = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L983" title="All 2 branches missed.">            return rowsDeleted &gt; 0;</span>
+
+<span class="fc" id="L985">        } catch (SQLException e) {</span>
+<span class="fc" id="L986">            System.out.println(&quot;Error deleting Pokemon: &quot; + e.getMessage());</span>
+<span class="fc" id="L987">            return false;</span>
+        }
+    }
+
+
+    public PokemonGeneratedImage getPokemonImageById(Integer id) {
+<span class="fc" id="L993">        String sql = null;</span>
+<span class="fc" id="L994">        PokemonGeneratedImage pokemonImage = null;</span>
+<span class="fc" id="L995">        ResultSet rs = null;</span>
+        try {
+            // Determine query based on input
+<span class="pc bpc" id="L998" title="1 of 2 branches missed.">            if (id != null) {</span>
+                // Query by ID if ID is provided
+<span class="fc" id="L1000">                sql = &quot;SELECT * FROM PokemonGeneratedImage WHERE PokemonID = ?&quot;;</span>
+<span class="fc" id="L1001">                PreparedStatement stmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L1002">                stmt.setInt(1, id);</span>
+<span class="fc" id="L1003">                rs = stmt.executeQuery();</span>
+            }
+            // Process the result
+<span class="pc bpc" id="L1006" title="1 of 4 branches missed.">            if (rs != null &amp;&amp; rs.next()) {</span>
+<span class="fc" id="L1007">                pokemonImage = new PokemonGeneratedImage(</span>
+<span class="fc" id="L1008">                    rs.getInt(&quot;PokemonId&quot;),</span>
+<span class="fc" id="L1009">                    rs.getBytes(&quot;Image&quot;)</span>
+                );
+            }
+        }
+<span class="nc" id="L1013">        catch (SQLException e) {</span>
+<span class="nc" id="L1014">            System.out.println(&quot;Error fetching Pokemon: &quot; + e.getMessage());</span>
+<span class="nc" id="L1015">        } catch (Exception e) {</span>
+<span class="nc" id="L1016">            e.printStackTrace();</span>
+<span class="pc" id="L1017">        }</span>
+<span class="fc" id="L1018">        return pokemonImage;</span>
+    }
+
+    public Connection getConn() {
+<span class="fc" id="L1022">        return conn;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

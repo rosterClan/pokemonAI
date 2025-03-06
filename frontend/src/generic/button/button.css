@@ -1,0 +1,32 @@
+
+
+.inner_btn {
+    background-color: #ff2e38;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.1s ease;
+}
+
+.inner_btn:active {
+    background-color: #cd242c;
+}
+
+.inner_btn p {
+    padding: 0px;
+    margin: 0px;
+    font-size: 20px;
+    color: white;
+}
+
+.unselectable {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+ }

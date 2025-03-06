@@ -1,0 +1,58 @@
+body {
+  margin: 0;
+  height: 100%;
+  background-image: url("background_2.png");
+  background-color: #cccccc;
+}
+
+html, body, #app, #app>div {
+  height: 100%
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@font-face {
+  font-family: 'pixel_font';
+  src: url('./font/Pokemon-Pixel-Font.eot');
+  src: url('./font/Pokemon-Pixel-Font.eot?#iefix') format('embedded-opentype'),
+      url('./font/Pokemon-Pixel-Font.woff2') format('woff2'),
+      url('./font/Pokemon-Pixel-Font.woff') format('woff'),
+      url('./font/Pokemon-Pixel-Font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+p {
+  font-family: 'pixel_font';
+}
+
+.title_font {
+  font-size: 45px;
+  margin: 0px;
+}
+
+:root {
+  --background: #FFFDE0;
+  --seccondary: #ff2e38;
+}
+
+
+
+.input_form {
+  padding-bottom: 5px;
+  margin: auto;
+}
+
+.input_label p {
+  margin: auto;
+  font-family: 'pixel_font';
+  padding: 0px;
+  margin: 0px;
+  font-size: 30px;
+  text-align: center;
+}

@@ -1,0 +1,164 @@
+{
+  "User": {
+    "Username": "john",
+    "Email": "john@example.com",
+    "Password": "password",
+    "SecurityQuestion": "What is your favorite color?",
+    "SecurityAnswer": "blue",
+    "RoleID" : 1
+  },
+  "Roles" : [
+    {
+      "RoleID": "1",
+      "RoleName": "Admin",
+      "RoleDescription": "Admins can do anything."
+    },
+    {
+      "RoleID": "2",
+      "RoleName": "User",
+      "RoleDescription": "Users can only view and edit their own data."
+    }
+  ],
+  "Biomes": [
+    {
+      "BiomeName": "Desert",
+      "BiomeDescription": "A hot, dry biome."
+    },
+    {
+      "BiomeName": "Tundra",
+      "BiomeDescription": "A cold, dry biome."
+    },
+    {
+        "BiomeName": "Rainforest",
+        "BiomeDescription": "A hot, wet biome."
+    },
+    {
+        "BiomeName": "Grassland",
+        "BiomeDescription": "A moderate, dry biome."
+    },
+    {
+        "BiomeName": "Taiga",
+        "BiomeDescription": "A cold, wet biome."
+    },
+    {
+        "BiomeName": "Deciduous Forest",
+        "BiomeDescription": "A moderate, wet biome."
+    },
+    {
+        "BiomeName": "Coniferous Forest",
+        "BiomeDescription": "A moderate, wet biome."
+    },
+    {
+        "BiomeName": "Savanna",
+        "BiomeDescription": "A hot, dry biome."
+    },
+    {
+        "BiomeName": "Chaparral",
+        "BiomeDescription": "A moderate, dry biome."
+    },
+    {
+        "BiomeName": "Freshwater",
+        "BiomeDescription": "A wet biome."
+    },
+    {
+        "BiomeName": "Marine",
+        "BiomeDescription": "A wet biome."
+    },
+    {
+        "BiomeName": "Estuary",
+        "BiomeDescription": "A wet biome."
+    },
+    {
+        "BiomeName": "Coral Reef",
+        "BiomeDescription": "A wet biome."
+    },
+    {
+        "BiomeName": "Mangrove",
+        "BiomeDescription": "A wet biome."
+    },
+    {
+        "BiomeName": "Polar Ice",
+        "BiomeDescription": "A cold, wet biome."
+    },
+    {
+        "BiomeName": "Alpine",
+        "BiomeDescription": "A cold, dry biome."
+    },
+    {
+        "BiomeName": "Wetland",
+        "BiomeDescription": "A wet biome."
+    },
+    {
+        "BiomeName": "Mountain",
+        "BiomeDescription": "A cold, wet biome."
+    },
+    {
+        "BiomeName": "Cave",
+        "BiomeDescription": "A moderate, wet biome."
+    },
+    {
+        "BiomeName": "Urban",
+        "BiomeDescription": "A moderate, dry biome."
+    }
+  ],
+  "PlantTypes" : [
+    {
+      "PlantTypeName": "Tree",
+      "PlantTypeDescription": "A tall plant with a trunk and branches."
+    },
+    {
+      "PlantTypeName": "Shrub",
+      "PlantTypeDescription": "A short plant with woody stems."
+    },
+    {
+      "PlantTypeName": "Grass",
+      "PlantTypeDescription": "A short plant with thin leaves."
+    },
+    {
+      "PlantTypeName": "Fern",
+      "PlantTypeDescription": "A plant with feathery leaves."
+    },
+    {
+      "PlantTypeName": "Moss",
+      "PlantTypeDescription": "A small plant that grows in clumps."
+    },
+    {
+      "PlantTypeName": "Algae",
+      "PlantTypeDescription": "A simple plant that grows in water."
+    },
+    {
+      "PlantTypeName": "Lichen",
+      "PlantTypeDescription": "A plant that is a combination of algae and fungus."
+    },
+    {
+      "PlantTypeName": "Fungi",
+      "PlantTypeDescription": "A plant that does not have chlorophyll."
+    }
+  ],
+  "AttributeCategories" : [
+    {
+      "AttributeCategoryName": "Cutting",
+      "AttributeCategoryDescription": "Like, tawny vines."
+    },
+    {
+      "AttributeCategoryName": "Braced",
+      "AttributeCategoryDescription": "Like, wood is tough/braced and stuff."
+    },
+    {
+      "AttributeCategoryName": "Psychedelic",
+      "AttributeCategoryDescription": "Mushrooms."
+    },
+    {
+      "AttributeCategoryName": "Poison",
+      "AttributeCategoryDescription": "Like, those berries mum tells me I’m not allowed to eat."
+    },
+    {
+      "AttributeCategoryName": "Kinetic",
+      "AttributeCategoryDescription": "If the plant moves in any way. Venus fly trap or those seeds which explode."
+    },
+    {
+      "AttributeCategoryName": "Behavioral",
+      "AttributeCategoryDescription": "Some plants will adopt colors and shapes to be aversive to herbivores."
+    }
+  ]
+}

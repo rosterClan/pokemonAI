@@ -1,0 +1,70 @@
+.cutaway {
+  background-color: #f2e6c9; 
+  height: 150px; 
+  width: 100%; 
+  margin-top: 0px; 
+  position: relative;
+}
+
+.profile-avatar {
+  width: 125px; 
+  height: 125px; 
+  border-radius: 50%;
+  background-color: transparent; 
+  background-image: url('../../generic/profile/static_assets/profile_image.png');
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.profile-form {
+  background-color: transparent; 
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title_txt_username p {
+  font-size: 50px;
+  text-align: center;
+  text-decoration: underline; 
+}
+
+.input_label p {
+  font-size: 25px; 
+  text-align: center;
+}
+
+.input-wrapper {
+  height: 50px;
+  margin-bottom: 40px; 
+  width: 50%;
+}
+
+.profile-form button {
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 32px; 
+  width: 300px; 
+  height: 30px; 
+}
+
+/* Styling for success and error messages */
+.success-message {
+  color: green;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.error-message {
+  color: red;
+  font-size: 18px;
+  margin-top: 20px;
+}

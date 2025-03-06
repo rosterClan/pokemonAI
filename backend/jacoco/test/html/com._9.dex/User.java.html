@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dex</a> &gt; <a href="index.source.html" class="el_package">com._9.dex</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com._9.dex;
+
+import org.springframework.security.core.parameters.P;
+
+public class User {
+
+<span class="fc" id="L7">    private Integer id = null;</span>
+    private String username;
+    private String password;
+    private String email;
+    private int role;
+    private String securityQuestion;
+    private String securityAnswer;
+
+<span class="fc" id="L15">    public User() {</span>
+
+<span class="fc" id="L17">    }</span>
+
+    // Password must be hashed when creating a new user object.
+    public User(String username, String password, String email, int role,
+<span class="fc" id="L21">        String securityQuestion, String securityAnswer) {</span>
+<span class="fc" id="L22">        this.username = username;</span>
+<span class="fc" id="L23">        this.password = password;</span>
+<span class="fc" id="L24">        this.email = email;</span>
+<span class="fc" id="L25">        this.role = role;</span>
+<span class="fc" id="L26">        this.securityQuestion = securityQuestion;</span>
+<span class="fc" id="L27">        this.securityAnswer = securityAnswer;</span>
+<span class="fc" id="L28">    }</span>
+
+    public User(int id, String username, String password, String email, int role,
+<span class="fc" id="L31">        String securityQuestion, String securityAnswer) {</span>
+<span class="fc" id="L32">        this.id = id;</span>
+<span class="fc" id="L33">        this.username = username;</span>
+<span class="fc" id="L34">        this.password = password;</span>
+<span class="fc" id="L35">        this.email = email;</span>
+<span class="fc" id="L36">        this.role = role;</span>
+<span class="fc" id="L37">        this.securityQuestion = securityQuestion;</span>
+<span class="fc" id="L38">        this.securityAnswer = securityAnswer;</span>
+
+<span class="fc" id="L40">    }</span>
+
+    public int getID() {
+<span class="nc" id="L43">        return this.id;</span>
+    }
+
+    public String getUsername() {
+<span class="fc" id="L47">        return this.username;</span>
+    }
+
+    public String getEmail() {
+<span class="fc" id="L51">        return this.email;</span>
+    }
+
+    public int getRole() {
+<span class="fc" id="L55">        return this.role;</span>
+    }
+
+    public String getSecurityQuestion() {
+<span class="fc" id="L59">        return this.securityQuestion;</span>
+    }
+
+    public boolean validateSecurityAnswer(String answer) {
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (answer.equals(this.securityAnswer)) {</span>
+<span class="fc" id="L64">            return true;</span>
+        } else {
+<span class="fc" id="L66">            return false;</span>
+        }
+    }
+
+    public boolean validatePassword(String password) {
+<span class="fc" id="L71">        PasswordHasher passwordHasher = new PasswordHasher(password);</span>
+<span class="fc" id="L72">        String hashedPassword = passwordHasher.hash();</span>
+
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (this.password.equals(hashedPassword)) {</span>
+<span class="nc" id="L75">            return true;</span>
+        } else {
+<span class="fc" id="L77">            return false;</span>
+        }
+    }
+
+    public String getPassword() {
+<span class="fc" id="L82">        return this.password;</span>
+    }
+
+    public String getSecurityAnswer() {
+<span class="fc" id="L86">        return this.securityAnswer;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

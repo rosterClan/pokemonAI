@@ -1,0 +1,35 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.5619'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(22)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.xerial:sqlite-jdbc:3.46.1.0'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+	implementation 'org.springframework.security:spring-security-core:5.8.0'
+	implementation 'org.json:json:20210307'
+	implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+	implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'com.drewnoakes:metadata-extractor:2.18.0'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

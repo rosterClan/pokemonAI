@@ -1,0 +1,75 @@
+.row_wpr {
+    width: 100%;
+    height: 50px;
+    background-color: #FFFDE0;
+    margin-bottom: 2px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dummy_background_colour {
+    background-color: #E6E3C0;
+    height: 100%;
+}
+
+.row_image {
+    flex: 0.5;
+    height: 100%;
+}
+
+.row_name {
+    flex: 2;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+.row_name p {
+    margin: 0px;
+    padding: 0px;
+    font-size: 25px;
+    margin-left: 15px;
+}
+
+.row_attributes {
+    flex: 1;
+    width: fit-content;
+    max-width: fit-content;
+
+    height: 100%;
+    
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+}
+.icon_container {
+    width: 30px;
+    height: 60%;
+    margin-right: 12px;
+    background-color: cadetblue;
+}
+
+.row_hide_btn {
+    flex: 0.25;
+
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+.row_hide_btn img {
+    width: 60%;
+}
+
+
+.row_image_display {
+    background-color: blue;
+    width: 100%;
+    height: 100%;
+
+}

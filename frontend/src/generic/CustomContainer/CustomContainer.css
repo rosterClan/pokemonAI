@@ -1,0 +1,57 @@
+.bodyContent {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+
+.box {
+    grid-column: 1;
+    grid-row: 1;
+    
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.box_frame {
+    width: fit-content;
+    height: fit-content;
+}
+
+.template_background {
+    background-color: var(--background);
+    border-radius: 20px;
+}
+
+.body_frame_corner {
+    flex:1;
+    max-width: 10px;
+    max-height: 10px;
+
+    min-width: 10px;
+    min-height: 10px;
+}
+
+.frame_wpr {
+    display: flex;
+    width: 100%;
+}
+
+.body_frame_verticle {
+    width: 10px;
+}
+
+.body_frame {
+    display: flex;
+    width: 100%;
+}
+
+.body_content_fr {
+    flex:1;
+    height: 100%;
+}
+
+
+.non_clickable {
+    pointer-events: none;
+}
