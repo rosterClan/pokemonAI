@@ -28,6 +28,7 @@ This was a group project between myself and five other student developers. Much 
 
 ## Figma Designs
 <div align="center">
+<p href="https://www.figma.com/design/BoWXZOqBCZaKXAMIPhf9yh/irl-pokidex?node-id=0-1&t=9L3TQrPCnUU2SgmV-1" align="center">CLICK HERE TO SEE FIGMA DESIGNS</p>
 <a href="https://www.figma.com/design/BoWXZOqBCZaKXAMIPhf9yh/irl-pokidex?node-id=0-1&t=9L3TQrPCnUU2SgmV-1">
     <img width="100%" src="https://drive.google.com/uc?export=view&id=11DyQ_cICyHgRkZG78Fp4jcPYFUw0npyW" alt="Logo">
 </a>
